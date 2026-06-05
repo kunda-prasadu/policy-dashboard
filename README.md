@@ -11,7 +11,14 @@ uuid
 date-fns
 playwright -->
 
-
+<!-- Json server creation:
+Created mock-api folder at root level
+addeed db.json file
+added generate-data.js file.
+In generate-data.js file created script to generate policies with randome details 
+adde start:api script in package.json file
+Used faker,UUID to generarate policy details.
+-->
 
 ## Development server
 
