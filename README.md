@@ -2,6 +2,17 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
 
+// Required packages
+<!-- angular 20
+material
+Json-server
+faker-js
+uuid
+date-fns
+playwright -->
+
+
+
 ## Development server
 
 To start a local development server, run:
