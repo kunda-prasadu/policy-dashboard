@@ -1,25 +1,22 @@
-<!-- <h1>Policy Dashboard</h1>
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="dashboard-title">
+      <h1>Policy Overview Dashboard</h1>
+      <span class="dashboard-subtitle">APAC Operations · {{ store.totalPolicies() }} total policies</span>
+    </div>
+  </header>
 
-@if(store.loading()){
-    <p>Loading policies...</p>
-} 
-@if(store.error()){
-    <p>Error loading policies: {{store.error()}}</p>
-}
-<p>
-    Total Policies: {{store.totalPolicies()}}
-</p>
+  <section class="dashboard-summary">
+    <app-summary-pannl></app-summary-pannl>
+  </section>
 
-<p>
-    Selected: {{store.selectedCount()}}
-</p>
+  <section class="dashboard-filters">
+    <app-policy-filter></app-policy-filter>
+  </section>
 
-<p>
-    Page Size: {{store.pagination().pageSize}}
-</p> -->
-<h1>Policy Overview Dashboard</h1>
+  <app-bulk-action-bar></app-bulk-action-bar>
 
-<app-summary-pannl></app-summary-pannl>
-<app-policy-filter></app-policy-filter>
-<app-bulk-action-bar></app-bulk-action-bar>
-<app-policy-table></app-policy-table>
+  <section class="dashboard-table">
+    <app-policy-table></app-policy-table>
+  </section>
+</div>

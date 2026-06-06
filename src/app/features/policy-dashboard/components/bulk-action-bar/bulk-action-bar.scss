@@ -1,0 +1,46 @@
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  margin-bottom: 12px;
+  background: var(--mat-sys-secondary-container);
+  border: 1px solid var(--mat-sys-secondary);
+  border-radius: 10px;
+  animation: slideDown 0.2s ease;
+
+  &__info {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  &__count {
+    font: var(--mat-sys-title-medium);
+    font-weight: 700;
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  &__label {
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

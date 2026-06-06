@@ -1,9 +1,9 @@
 <form [formGroup]="filterForm">
-    <mat-form-field>
+    <mat-form-field appearance="outline">
         <mat-label>Search</mat-label>
-        <input matInput formControlName="searchTerm" placeholder="Policy Number / Holder Name ">
+        <input matInput formControlName="searchTerm" placeholder="Policy Number / Holder Name">
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
             <mat-option value="">All</mat-option>
@@ -12,7 +12,7 @@
             }
         </mat-select>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
         <mat-label>Region</mat-label>
         <mat-select formControlName="region">
             <mat-option value="">All</mat-option>
@@ -21,7 +21,7 @@
             }
         </mat-select>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
         <mat-label>Line of Business</mat-label>
         <mat-select formControlName="lineOfBusiness">
             <mat-option value="">All</mat-option>
@@ -30,5 +30,7 @@
             }
         </mat-select>
     </mat-form-field>
-    <button mat-raised-button color="primary" (click)="clearFilters()">Clear Filters</button>
+    <div class="filter-actions">
+        <button mat-stroked-button (click)="clearFilters()">Clear Filters</button>
+    </div>
 </form>

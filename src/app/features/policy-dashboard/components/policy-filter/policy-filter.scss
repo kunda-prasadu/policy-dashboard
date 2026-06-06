@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+// Hide the hint/error subscript space so form fields don't have dangling whitespace
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  // align-items: end → button/field bottoms align perfectly;
+  // floating-label zone above the outlined box is irrelevant with this
+  align-items: end;
+  padding: 16px 20px;
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+  // Compact height via Angular Material M3 CSS tokens (default is 56px)
+  --mat-form-field-container-height: 42px;
+  --mat-form-field-container-vertical-padding: 9px;
+  --mdc-outlined-text-field-container-height: 42px;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: stretch;
+
+  button {
+    height: 42px;
+    white-space: nowrap;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+}

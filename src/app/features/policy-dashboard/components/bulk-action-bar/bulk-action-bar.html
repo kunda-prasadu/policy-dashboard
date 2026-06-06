@@ -1,6 +1,14 @@
 @if(store.hasSelection()){
-    <div class="bulk-action-bar">
-        <span>{{ store.selectedCount() }} policies selected</span>
-        <button mat-button color="primary" (click)="flagForreview()">Flag for Review</button>
+  <div class="bulk-action-bar" role="toolbar" aria-label="Bulk actions">
+    <div class="bulk-action-bar__info">
+      <span class="bulk-action-bar__count">{{ store.selectedCount() }}</span>
+      <span class="bulk-action-bar__label">{{ store.selectedCount() === 1 ? 'policy' : 'policies' }} selected</span>
     </div>
+    <div class="bulk-action-bar__actions">
+      <button mat-stroked-button (click)="store.clearSelection()">Clear Selection</button>
+      <button mat-raised-button color="warn" (click)="flagForreview()">
+        🚩 Flag for Review
+      </button>
+    </div>
+  </div>
 }
