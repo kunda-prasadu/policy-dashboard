@@ -14,5 +14,9 @@ private readonly baseUrl = `${environment.apiUrl}/policies`;
 
 getPolicies(): Observable<Policy[]> {
   return this.http.get<Policy[]>(this.baseUrl);    
-    }     
+}
+
+flagPolicy(id: string): Observable<Policy> {
+  return this.http.patch<Policy>(`${this.baseUrl}/${id}`, { flaggedForReview: true });
+}
 }

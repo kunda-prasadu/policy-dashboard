@@ -5,26 +5,33 @@
 .summary-section {
   &__title {
     margin: 0 0 16px;
-    font: var(--mat-sys-title-medium);
     font-weight: 600;
     color: var(--mat-sys-on-surface-variant);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     font-size: 11px;
+
+    &--spaced {
+      margin-top: 28px;
+    }
   }
 }
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
+  &--4 {
+    grid-template-columns: repeat(4, 1fr);
+    @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 480px) { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  &--5 {
+    grid-template-columns: repeat(5, 1fr);
+    @media (max-width: 1100px) { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 700px)  { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 480px)  { grid-template-columns: 1fr; }
   }
 }
 
@@ -97,27 +104,43 @@
     background: #f3e5f5;
     color: #6a1b9a;
   }
+
+  // Key Metrics row
+  &--expiring .summary-card__icon {
+    background: #fff3e0;
+    color: #e65100;
+  }
+
+  &--property .summary-card__icon {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  &--casualty .summary-card__icon {
+    background: #f1f8e9;
+    color: #2e7d32;
+  }
+
+  &--ah .summary-card__icon {
+    background: #fce4ec;
+    color: #ad1457;
+  }
+
+  &--marine .summary-card__icon {
+    background: #e0f7fa;
+    color: #00695c;
+  }
 }
 
 // Dark theme overrides
 :host-context(html.dark-theme) {
-  .summary-card--active .summary-card__icon {
-    background: rgba(30, 126, 52, 0.2);
-    color: #81c995;
-  }
-
-  .summary-card--pending .summary-card__icon {
-    background: rgba(245, 124, 0, 0.2);
-    color: #ffb74d;
-  }
-
-  .summary-card--expired .summary-card__icon {
-    background: rgba(198, 40, 40, 0.2);
-    color: #ef9a9a;
-  }
-
-  .summary-card--cancelled .summary-card__icon {
-    background: rgba(106, 27, 154, 0.2);
-    color: #ce93d8;
-  }
+  .summary-card--active .summary-card__icon    { background: rgba(30, 126, 52, 0.2);   color: #81c995; }
+  .summary-card--pending .summary-card__icon   { background: rgba(245, 124, 0, 0.2);   color: #ffb74d; }
+  .summary-card--expired .summary-card__icon   { background: rgba(198, 40, 40, 0.2);   color: #ef9a9a; }
+  .summary-card--cancelled .summary-card__icon { background: rgba(106, 27, 154, 0.2);  color: #ce93d8; }
+  .summary-card--expiring .summary-card__icon  { background: rgba(230, 81, 0, 0.2);    color: #ffcc80; }
+  .summary-card--property .summary-card__icon  { background: rgba(21, 101, 192, 0.2);  color: #90caf9; }
+  .summary-card--casualty .summary-card__icon  { background: rgba(46, 125, 50, 0.2);   color: #a5d6a7; }
+  .summary-card--ah .summary-card__icon        { background: rgba(173, 20, 87, 0.2);   color: #f48fb1; }
+  .summary-card--marine .summary-card__icon    { background: rgba(0, 105, 92, 0.2);    color: #80cbc4; }
 }

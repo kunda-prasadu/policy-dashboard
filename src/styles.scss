@@ -61,3 +61,23 @@ html.dark-theme {
   --mat-sys-surface-container-highest: #234875;
   --mat-sys-outline-variant: #2a4a6b;
 }
+
+// ─── Snackbar panel classes (global — snackbars render outside component scope) ───
+.snack-flag-success {
+  .mdc-snackbar__surface {
+    background-color: #1e4620 !important;  // dark green surface
+  }
+  .mdc-snackbar__label {
+    color: #c8e6c9 !important;             // light green text
+    font-weight: 500;
+  }
+  .mat-mdc-snack-bar-action .mdc-button__label {
+    color: #81c995 !important;             // green dismiss link
+  }
+}
+
+html.dark-theme .snack-flag-success {
+  .mdc-snackbar__surface {
+    background-color: #0f2e11 !important;
+  }
+}

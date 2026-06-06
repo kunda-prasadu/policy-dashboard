@@ -8,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './loading-skeleton.scss',
 })
 export class LoadingSkeleton {
-
+  /** Used in @for to generate 10 placeholder rows */
+  readonly rows = Array.from({ length: 10 }, (_, i) => i);
 }

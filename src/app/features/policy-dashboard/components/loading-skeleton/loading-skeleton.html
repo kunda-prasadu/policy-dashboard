@@ -1,1 +1,66 @@
-<p>loading-skeleton works!</p>
+<div class="skeleton-wrap">
+
+  <!-- Summary cards -->
+  <div class="skeleton-summary">
+    <div class="skeleton-card">
+      <div class="shimmer skeleton-card__icon"></div>
+      <div class="skeleton-card__lines">
+        <div class="shimmer skeleton-card__count"></div>
+        <div class="shimmer skeleton-card__label"></div>
+      </div>
+    </div>
+    <div class="skeleton-card">
+      <div class="shimmer skeleton-card__icon"></div>
+      <div class="skeleton-card__lines">
+        <div class="shimmer skeleton-card__count"></div>
+        <div class="shimmer skeleton-card__label"></div>
+      </div>
+    </div>
+    <div class="skeleton-card">
+      <div class="shimmer skeleton-card__icon"></div>
+      <div class="skeleton-card__lines">
+        <div class="shimmer skeleton-card__count"></div>
+        <div class="shimmer skeleton-card__label"></div>
+      </div>
+    </div>
+    <div class="skeleton-card">
+      <div class="shimmer skeleton-card__icon"></div>
+      <div class="skeleton-card__lines">
+        <div class="shimmer skeleton-card__count"></div>
+        <div class="shimmer skeleton-card__label"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="skeleton-filter">
+    <div class="shimmer skeleton-filter__field skeleton-filter__field--wide"></div>
+    <div class="shimmer skeleton-filter__field"></div>
+    <div class="shimmer skeleton-filter__field"></div>
+    <div class="shimmer skeleton-filter__field"></div>
+    <div class="shimmer skeleton-filter__btn"></div>
+  </div>
+
+  <!-- Table -->
+  <div class="skeleton-table">
+    <div class="skeleton-table__header">
+      <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+      <div class="shimmer skeleton-table__cell"></div>
+      <div class="shimmer skeleton-table__cell"></div>
+      <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+      <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+      <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+    </div>
+    @for (row of rows; track row) {
+      <div class="skeleton-table__row">
+        <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+        <div class="shimmer skeleton-table__cell"></div>
+        <div class="shimmer skeleton-table__cell"></div>
+        <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+        <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+        <div class="shimmer skeleton-table__cell skeleton-table__cell--sm"></div>
+      </div>
+    }
+  </div>
+
+</div>

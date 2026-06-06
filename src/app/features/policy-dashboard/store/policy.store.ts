@@ -22,7 +22,7 @@ export class PolicyStore {
 
     readonly sort = signal<SortState>({ active: '', direction: '' });
 
-    readonly selectedPolicyIds = signal<String[]>([]);
+    readonly selectedPolicyIds = signal<string[]>([]);
 
     readonly selectedCount =  computed(() => this.selectedPolicyIds().length);
 
@@ -60,7 +60,10 @@ export class PolicyStore {
             casualtyPremium: policies.filter(p => p.lineOfBusiness === 'Casualty').reduce((sum, p) => sum + p.premiumAmount, 0),
             ahPremium: policies.filter(p => p.lineOfBusiness === 'A&H').reduce((sum, p) => sum + p.premiumAmount, 0),
             marinePremium: policies.filter(p => p.lineOfBusiness === 'Marine').reduce((sum, p) => sum + p.premiumAmount, 0),
-            expiringWithin30Days: policies.filter(p => p.expiryDate >= today && p.expiryDate <= next30Days).length
+            expiringWithin30Days: policies.filter(p => {
+            const d = new Date(p.expiryDate);
+            return d >= today && d <= next30Days;
+        }).length
         }
     })
 
@@ -110,13 +113,19 @@ export class PolicyStore {
   
     flagSelectedPolicies(): void {
         const selectedIds = this.selectedPolicyIds();
-        const updatedPolicies = this.policies().map(policy => {
-            if(selectedIds.includes(policy.id)) {
-                return { ...policy, flaggedForReview: true };
-            }
-            return policy;  
-        })
+
+        // Optimistic update — reflect in UI immediately
+        const updatedPolicies = this.policies().map(policy =>
+            selectedIds.includes(policy.id)
+                ? { ...policy, flaggedForReview: true }
+                : policy
+        );
         this.policies.set(updatedPolicies);
         this.clearSelection();
+
+        // Persist each flagged policy to the backend
+        selectedIds.forEach(id => {
+            this.policyApiService.flagPolicy(id).subscribe();
+        });
     }
 }

@@ -6,17 +6,26 @@
     </div>
   </header>
 
-  <section class="dashboard-summary">
-    <app-summary-pannl></app-summary-pannl>
-  </section>
+  @if (store.loading()) {
+    <app-loading-skeleton />
+  } @else if (store.error()) {
+    <app-error-state
+      [message]="store.error()"
+      (retryClick)="retry()"
+    />
+  } @else {
+    <section class="dashboard-summary">
+      <app-summary-pannl />
+    </section>
 
-  <section class="dashboard-filters">
-    <app-policy-filter></app-policy-filter>
-  </section>
+    <section class="dashboard-filters">
+      <app-policy-filter />
+    </section>
 
-  <app-bulk-action-bar></app-bulk-action-bar>
+    <app-bulk-action-bar />
 
-  <section class="dashboard-table">
-    <app-policy-table></app-policy-table>
-  </section>
+    <section class="dashboard-table">
+      <app-policy-table />
+    </section>
+  }
 </div>

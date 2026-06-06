@@ -1,1 +1,9 @@
-<p>error-state works!</p>
+<div class="error-state" role="alert">
+  <div class="error-state__icon" aria-hidden="true">&#9888;</div>
+  <h2 class="error-state__title">Something went wrong</h2>
+  <p class="error-state__message">{{ message || 'Failed to load policies. Please try again.' }}</p>
+  <button mat-flat-button (click)="retryClick.emit()" class="error-state__retry">
+    <mat-icon>refresh</mat-icon>
+    Retry
+  </button>
+</div>

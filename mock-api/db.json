@@ -12,7 +12,7 @@
       "region": "Hong Kong",
       "underwriter": "Hardy Wilderman",
       "status": "Expired",
-      "flaggedForReview": false
+      "flaggedForReview": true
     },
     {
       "id": "21ac72a8-0d0e-40f4-9f28-4ef048f7c361",
@@ -3500,5 +3500,6 @@
       "status": "Active",
       "flaggedForReview": false
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
