@@ -1,7 +1,12 @@
 import { inject, Injectable, signal,computed } from '@angular/core';
 import { Policy } from '../models/policy.model';
 import { PolicyApiService } from '../services/policy-api.service';
+import { PolicyFilter } from '../models/policy-filter.model';
+import { Pagination } from '../models/pagination.model';
+import { SortState } from '../models/sort.model';
+import { DEFAULT_FILTERS } from './policy-dashboard.state';
 
+@Injectable({ providedIn: 'root' })
 export class PolicyStore {
     private readonly policyApiService = inject(PolicyApiService);
 
@@ -11,7 +16,19 @@ export class PolicyStore {
 
     readonly error = signal<string | null>(null);
 
-    readonly totalPolicies = computed(() => this.policies.length);
+    readonly filters = signal<PolicyFilter>(DEFAULT_FILTERS);
+
+    readonly pagination = signal<Pagination>({ pageIndex: 0, pageSize: 10, totalRecords: 0 });
+
+    readonly sort = signal<SortState>({ active: '', direction: '' });
+
+    readonly selectedPolicyIds = signal<String[]>([]);
+
+    readonly selectedCount =  computed(() => this.selectedPolicyIds().length);
+
+    readonly hasSelection = computed(() => this.selectedCount() > 0);
+
+    readonly totalPolicies = computed(() => this.policies().length);
 
     loadingPolicies():void {
         this.loading.set(true);
@@ -27,4 +44,30 @@ export class PolicyStore {
             }
         })
     }
+
+    updateFilters( filters: Partial<PolicyFilter>): void {
+        this.filters.update(current => ({ ...current, ...filters }));
+    }
+
+    updatePagination(pageIndex:number, pageSize?: number): void {
+        this.pagination.update(current => ({ ...current, pageIndex, ...(pageSize !== undefined && { pageSize }) }));
+    }
+
+    updateSort(active: string, direction: 'asc' | 'desc' | ''): void {
+        this.sort.set({ active, direction });
+    }
+
+    toggleSelection(policyId: string): void {
+        const selected = this.selectedPolicyIds();
+        if (selected.includes(policyId)) {
+            this.selectedPolicyIds.set(selected.filter(id => id !== policyId));
+            return;
+        }
+    this.selectedPolicyIds.set([...selected, policyId]);
+    }
+
+    clearSelection(): void {
+        this.selectedPolicyIds.set([]);
+    }
+
 }

@@ -1,0 +1,25 @@
+<!-- <h1>Policy Dashboard</h1>
+
+@if(store.loading()){
+    <p>Loading policies...</p>
+} 
+@if(store.error()){
+    <p>Error loading policies: {{store.error()}}</p>
+}
+<p>
+    Total Policies: {{store.totalPolicies()}}
+</p>
+
+<p>
+    Selected: {{store.selectedCount()}}
+</p>
+
+<p>
+    Page Size: {{store.pagination().pageSize}}
+</p> -->
+<h1>Policy Overview Dashboard</h1>
+
+<app-summary-pannl></app-summary-pannl>
+<app-policy-filter></app-policy-filter>
+<app-bulk-action-bar></app-bulk-action-bar>
+<app-policy-table></app-policy-table>
