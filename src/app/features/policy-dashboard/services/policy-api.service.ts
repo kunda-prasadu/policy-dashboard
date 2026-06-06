@@ -19,4 +19,8 @@ getPolicies(): Observable<Policy[]> {
 flagPolicy(id: string): Observable<Policy> {
   return this.http.patch<Policy>(`${this.baseUrl}/${id}`, { flaggedForReview: true });
 }
+
+renewPolicy(id: string): Observable<Policy> {
+  return this.http.patch<Policy>(`${this.baseUrl}/${id}`, { status: 'Active' });
+}
 }

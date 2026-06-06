@@ -4,7 +4,7 @@
   <div class="drilldown__header" [style.border-color]="meta.color">
     <div class="drilldown__title">
       <mat-icon [style.color]="meta.color">{{ meta.icon }}</mat-icon>
-      <span>{{ data.status }} Policies</span>
+      <span>{{ dialogTitle }}</span>
       <span class="drilldown__count" [style.background]="meta.color">{{ policies().length }}</span>
     </div>
     <button mat-icon-button (click)="close()" class="drilldown__close">
@@ -17,10 +17,20 @@
     @if (policies().length === 0) {
       <div class="drilldown__empty">
         <mat-icon>search_off</mat-icon>
-        <p>No {{ data.status }} policies found</p>
+        <p>No matching policies found</p>
       </div>
     } @else {
       <table mat-table [dataSource]="policies()" class="drilldown-table">
+
+        <!-- Days Left (expiring mode only) -->
+        <ng-container matColumnDef="daysLeft">
+          <th mat-header-cell *matHeaderCellDef>Urgency</th>
+          <td mat-cell *matCellDef="let p">
+            <span class="days-badge" [ngClass]="urgencyClass(p.expiryDate)">
+              {{ daysLeft(p.expiryDate) }}d left
+            </span>
+          </td>
+        </ng-container>
 
         <!-- Policy Number -->
         <ng-container matColumnDef="policyNumber">
@@ -79,8 +89,26 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <!-- Renew (expiring mode only) -->
+        <ng-container matColumnDef="renew">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let p" class="cell-renew">
+            <button mat-stroked-button class="renew-btn"
+              [disabled]="renewingIds().has(p.id)"
+              (click)="renew(p.id)"
+              matTooltip="Renew policy — set status to Active">
+              @if (renewingIds().has(p.id)) {
+                <mat-progress-spinner diameter="14" mode="indeterminate" strokeWidth="2" />
+              } @else {
+                <mat-icon>autorenew</mat-icon>
+              }
+              Renew
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns();" [ngClass]="rowUrgencyClass(row)"></tr>
 
       </table>
     }
@@ -88,9 +116,7 @@
 
   <!-- Footer -->
   <div class="drilldown__footer">
-    <span class="drilldown__footer-info">
-      Showing {{ policies().length }} {{ data.status }} {{ policies().length === 1 ? 'policy' : 'policies' }}
-    </span>
+    <span class="drilldown__footer-info">{{ footerLabel }}</span>
     <button mat-stroked-button (click)="close()">Close</button>
   </div>
 

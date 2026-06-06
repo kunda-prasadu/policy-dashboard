@@ -137,4 +137,13 @@ export class PolicyStore {
             this.policyApiService.flagPolicy(id).subscribe();
         });
     }
+
+    renewPolicy(id: string): void {
+        // Optimistic update — change status to Active immediately
+        this.policies.update(all =>
+            all.map(p => p.id === id ? { ...p, status: 'Active' as const } : p)
+        );
+        // Persist to backend
+        this.policyApiService.renewPolicy(id).subscribe();
+    }
 }

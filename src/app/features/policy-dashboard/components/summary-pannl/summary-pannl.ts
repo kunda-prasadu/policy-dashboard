@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PolicyStore } from '../../store/policy.store';
 import { PolicyStatus } from '../../models/policy.model';
-import { PolicyDrilldownDialog } from '../policy-drilldown-dialog/policy-drilldown-dialog';
+import { PolicyDrilldownDialog, DrilldownMode } from '../policy-drilldown-dialog/policy-drilldown-dialog';
 
 @Component({
   selector: 'app-summary-pannl',
@@ -17,9 +17,9 @@ export class SummaryPannl {
   private readonly dialog = inject(MatDialog);
   readonly summary = this.store.summary;
 
-  openDrilldown(status: PolicyStatus): void {
+  openDrilldown(mode: DrilldownMode, status?: PolicyStatus): void {
     this.dialog.open(PolicyDrilldownDialog, {
-      data: { status },
+      data: { mode, status },
       width: '85vw',
       maxWidth: '1100px',
       maxHeight: '80vh',
@@ -27,7 +27,23 @@ export class SummaryPannl {
     });
   }
 
-  /** Compact currency: 1_500_000 → $1.5M, 250_000 → $250K */
+  /** 0–100 percentage of active policies that are expiring within 30 days */
+  readonly expiringPct = computed(() => {
+    const s = this.store.summary();
+    if (!s.activeCount) return 0;
+    return Math.min(100, Math.round((s.expiringWithin30Days / s.activeCount) * 100));
+  });
+
+  /**
+   * Returns the SVG stroke-dashoffset for a circle with r=18 (circumference ≈ 113).
+   * offset = circumference * (1 - pct/100)
+   */
+  arcOffset(pct: number): number {
+    const circumference = 2 * Math.PI * 18; // ~113.1
+    return circumference * (1 - pct / 100);
+  }
+
+  readonly arcCircumference = 2 * Math.PI * 18;
   formatPremium(value: number): string {
     if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
     if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;

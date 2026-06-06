@@ -4,7 +4,7 @@
   <h2 class="summary-section__title">Policy Status</h2>
   <div class="summary-grid summary-grid--4">
 
-    <div class="summary-card summary-card--active summary-card--clickable" (click)="openDrilldown('Active')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Active')">
+    <div class="summary-card summary-card--active summary-card--clickable" (click)="openDrilldown('status', 'Active')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Active')">
       <div class="summary-card__content">
         <span class="summary-card__label">Active Policies</span>
         <span class="summary-card__count">{{ summary().activeCount }}</span>
@@ -13,7 +13,7 @@
       <div class="summary-card__icon"><mat-icon>task_alt</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--pending summary-card--clickable" (click)="openDrilldown('Pending')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Pending')">
+    <div class="summary-card summary-card--pending summary-card--clickable" (click)="openDrilldown('status', 'Pending')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Pending')">
       <div class="summary-card__content">
         <span class="summary-card__label">Pending Policies</span>
         <span class="summary-card__count">{{ summary().pendingCount }}</span>
@@ -22,7 +22,7 @@
       <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--expired summary-card--clickable" (click)="openDrilldown('Expired')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Expired')">
+    <div class="summary-card summary-card--expired summary-card--clickable" (click)="openDrilldown('status', 'Expired')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Expired')">
       <div class="summary-card__content">
         <span class="summary-card__label">Expired Policies</span>
         <span class="summary-card__count">{{ summary().expiredCount }}</span>
@@ -31,7 +31,7 @@
       <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--cancelled summary-card--clickable" (click)="openDrilldown('Cancelled')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Cancelled')">
+    <div class="summary-card summary-card--cancelled summary-card--clickable" (click)="openDrilldown('status', 'Cancelled')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Cancelled')">
       <div class="summary-card__content">
         <span class="summary-card__label">Cancelled Policies</span>
         <span class="summary-card__count">{{ summary().cancelledCount }}</span>
@@ -47,13 +47,31 @@
   <div class="metrics-row">
 
     <!-- Expiring soon -->
-    <div class="summary-card summary-card--expiring metrics-expiring">
+    <div class="summary-card summary-card--expiring metrics-expiring summary-card--clickable" (click)="openDrilldown('expiring')" role="button" tabindex="0" (keydown.enter)="openDrilldown('expiring')">
       <div class="summary-card__content">
         <span class="summary-card__label">Expiring in 30 Days</span>
         <span class="summary-card__count">{{ summary().expiringWithin30Days }}</span>
         <span class="summary-card__sub summary-card__sub--warn">action required</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>notifications_active</mat-icon></div>
+      <!-- Arc progress widget -->
+      <div class="arc-widget">
+        <svg width="52" height="52" viewBox="0 0 52 52" class="arc-svg">
+          <!-- Track -->
+          <circle class="arc-track"
+            cx="26" cy="26" r="18"
+            fill="none" stroke-width="5"
+            [attr.stroke-dasharray]="arcCircumference"
+            stroke-dashoffset="0" />
+          <!-- Progress arc -->
+          <circle class="arc-fill"
+            cx="26" cy="26" r="18"
+            fill="none" stroke-width="5"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="arcCircumference"
+            [attr.stroke-dashoffset]="arcOffset(expiringPct())" />
+        </svg>
+        <span class="arc-label">{{ expiringPct() }}%</span>
+      </div>
     </div>
 
     <!-- GWP by LOB — progress bar card -->
