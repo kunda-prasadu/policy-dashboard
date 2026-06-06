@@ -19,8 +19,8 @@ export class PolicyTable {
   displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'status', 'region', 'premium'];
   dataSource = new MatTableDataSource<any>();
 
-  sort !: MatSort;
-  paginator !: MatPaginator;
+  sort = viewChild(MatSort);
+  paginator = viewChild(MatPaginator);
 
   constructor() {
     this.dataSource.data = this.store.filteredPolicies();
@@ -31,8 +31,10 @@ export class PolicyTable {
   }
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    const sort = this.sort();
+    const paginator = this.paginator();
+    if (sort) this.dataSource.sort = sort;
+    if (paginator) this.dataSource.paginator = paginator;
   }
 
   toggleSelection(policyId: string): void  {
@@ -40,12 +42,15 @@ export class PolicyTable {
   }
 
   toggleSelectAll(): void {
-    const allIds = this.store.filteredPolicies().map(p => p.id);
-    const allSelected = allIds.every(id => this.store.selectedPolicyIds().includes(id));
+    const paginator = this.paginator();
+    const pageStart = paginator ? paginator.pageIndex * paginator.pageSize : 0;
+    const pageEnd = paginator ? pageStart + paginator.pageSize : this.dataSource.filteredData.length;
+    const pageIds = this.dataSource.filteredData.slice(pageStart, pageEnd).map((p: any) => p.id);
+    const allSelected = pageIds.every((id: string) => this.store.selectedPolicyIds().includes(id));
     if (allSelected) {
       this.store.clearSelection();
     } else {
-      this.store.selectAll(allIds);
+      this.store.selectAll(pageIds);
     }
   }
 }
