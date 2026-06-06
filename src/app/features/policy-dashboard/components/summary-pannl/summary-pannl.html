@@ -4,7 +4,7 @@
   <h2 class="summary-section__title">Policy Status</h2>
   <div class="summary-grid summary-grid--4">
 
-    <div class="summary-card summary-card--active">
+    <div class="summary-card summary-card--active summary-card--clickable" (click)="openDrilldown('Active')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Active')">
       <div class="summary-card__content">
         <span class="summary-card__label">Active Policies</span>
         <span class="summary-card__count">{{ summary().activeCount }}</span>
@@ -13,7 +13,7 @@
       <div class="summary-card__icon"><mat-icon>task_alt</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--pending">
+    <div class="summary-card summary-card--pending summary-card--clickable" (click)="openDrilldown('Pending')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Pending')">
       <div class="summary-card__content">
         <span class="summary-card__label">Pending Policies</span>
         <span class="summary-card__count">{{ summary().pendingCount }}</span>
@@ -22,7 +22,7 @@
       <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--expired">
+    <div class="summary-card summary-card--expired summary-card--clickable" (click)="openDrilldown('Expired')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Expired')">
       <div class="summary-card__content">
         <span class="summary-card__label">Expired Policies</span>
         <span class="summary-card__count">{{ summary().expiredCount }}</span>
@@ -31,7 +31,7 @@
       <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--cancelled">
+    <div class="summary-card summary-card--cancelled summary-card--clickable" (click)="openDrilldown('Cancelled')" role="button" tabindex="0" (keydown.enter)="openDrilldown('Cancelled')">
       <div class="summary-card__content">
         <span class="summary-card__label">Cancelled Policies</span>
         <span class="summary-card__count">{{ summary().cancelledCount }}</span>

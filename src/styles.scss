@@ -111,3 +111,15 @@ html.dark-theme .snack-flag-success {
   max-width: 95vw !important;
   margin: 0 auto !important;
 }
+
+// ── Drill-down dialog ─────────────────────────────────────────────────────────
+.drilldown-dialog-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+
+  .mdc-dialog__surface {
+    border-radius: 20px !important;
+    overflow: hidden !important;
+  }
+}
