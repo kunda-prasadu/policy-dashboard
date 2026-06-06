@@ -20,7 +20,7 @@
         <p>No matching policies found</p>
       </div>
     } @else {
-      <table mat-table [dataSource]="policies()" class="drilldown-table" [attr.aria-label]="dialogTitle + ' policies'">
+      <table mat-table [dataSource]="policies()" class="drilldown-table" [attr.aria-label]="dialogTitle + ' policies'" [trackBy]="trackById">
 
         <!-- Days Left (expiring mode only) -->
         <ng-container matColumnDef="daysLeft">

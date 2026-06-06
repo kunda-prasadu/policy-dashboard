@@ -104,6 +104,10 @@ export class PolicyDrilldownDialog {
     return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  trackById(_index: number, policy: { id: string }): string {
+    return policy.id;
+  }
+
   renew(id: string): void {
     if (this.renewingIds().has(id)) return;
     this.renewingIds.update(s => new Set([...s, id]));

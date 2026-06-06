@@ -1,14 +1,16 @@
-import { inject, Injectable, signal,computed } from '@angular/core';
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { Policy } from '../models/policy.model';
 import { PolicyApiService } from '../services/policy-api.service';
 import { PolicyFilter } from '../models/policy-filter.model';
 import { Pagination } from '../models/pagination.model';
 import { SortState } from '../models/sort.model';
 import { DEFAULT_FILTERS } from './policy-dashboard.state';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class PolicyStore {
     private readonly policyApiService = inject(PolicyApiService);
+    private readonly logger = inject(LoggerService);
 
     readonly  policies = signal<Policy[]>([]);
 
@@ -78,15 +80,18 @@ export class PolicyStore {
 
     loadingPolicies():void {
         this.loading.set(true);
+        this.logger.info('Loading policies from API');
 
         this.policyApiService.getPolicies().subscribe({
             next: (policies) => {
                 this.policies.set(policies);
                 this.loading.set(false);
+                this.logger.info(`Loaded ${policies.length} policies`);
             },
             error: (err) => {
                 this.error.set(err.message);
                 this.loading.set(false);
+                this.logger.error('Failed to load policies', err);
             }
         })
     }
@@ -122,6 +127,7 @@ export class PolicyStore {
   
     flagSelectedPolicies(): void {
         const selectedIds = this.selectedPolicyIds();
+        this.logger.info(`Flagging ${selectedIds.length} policies for review`);
 
         // Optimistic update — reflect in UI immediately
         const updatedPolicies = this.policies().map(policy =>
@@ -134,16 +140,21 @@ export class PolicyStore {
 
         // Persist each flagged policy to the backend
         selectedIds.forEach(id => {
-            this.policyApiService.flagPolicy(id).subscribe();
+            this.policyApiService.flagPolicy(id).subscribe({
+                error: (err) => this.logger.error(`Failed to flag policy ${id}`, err),
+            });
         });
     }
 
     renewPolicy(id: string): void {
+        this.logger.info(`Renewing policy ${id}`);
         // Optimistic update — change status to Active immediately
         this.policies.update(all =>
             all.map(p => p.id === id ? { ...p, status: 'Active' as const } : p)
         );
         // Persist to backend
-        this.policyApiService.renewPolicy(id).subscribe();
+        this.policyApiService.renewPolicy(id).subscribe({
+            error: (err) => this.logger.error(`Failed to renew policy ${id}`, err),
+        });
     }
 }
