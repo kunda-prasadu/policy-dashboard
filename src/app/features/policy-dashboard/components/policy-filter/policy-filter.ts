@@ -11,6 +11,7 @@ import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-s
 import { PolicyStore } from '../../store/policy.store';
 import { PolicyStatus, Region, LineOfBussiness } from '../../models/policy.model';
 import { FilterPanel } from '../filter-panel/filter-panel';
+import { StorageService } from '../../../../core/services/storage.service';
 
 @Component({
   selector: 'app-policy-filter',
@@ -29,8 +30,11 @@ export class PolicyFilter implements OnDestroy {
   private readonly router      = inject(Router);
   private readonly route       = inject(ActivatedRoute);
   private readonly bottomSheet = inject(MatBottomSheet);
+  private readonly storage     = inject(StorageService);
   readonly store               = inject(PolicyStore);
   private readonly destroy$    = new Subject<void>();
+
+  private static readonly STORAGE_KEY = 'policy-filters';
 
   readonly filterForm = this.fb.group({
     searchTerm:     [''],
@@ -56,9 +60,10 @@ export class PolicyFilter implements OnDestroy {
   });
 
   constructor() {
-    // ── 1. Seed form from URL on first load ──────────────────────────────────
+    // ── 1. Seed form: URL params take priority, then localStorage, then defaults
     const p = this.route.snapshot.queryParams;
-    if (p['search'] || p['status'] || p['region'] || p['lob'] || p['from'] || p['to']) {
+    const hasUrlParams = p['search'] || p['status'] || p['region'] || p['lob'] || p['from'] || p['to'];
+    if (hasUrlParams) {
       this.filterForm.patchValue({
         searchTerm:     p['search'] ?? '',
         status:         p['status'] ?? '',
@@ -67,6 +72,19 @@ export class PolicyFilter implements OnDestroy {
         startDate:      p['from'] ? new Date(p['from']) : null,
         endDate:        p['to']   ? new Date(p['to'])   : null,
       }, { emitEvent: true });
+    } else {
+      const saved = this.storage.get<Record<string, unknown>>(PolicyFilter.STORAGE_KEY);
+      if (saved) {
+        this.filterForm.patchValue({
+          searchTerm:     (saved['searchTerm']     ?? '') as string,
+          status:         (saved['status']         ?? '') as string,
+          region:         (saved['region']         ?? '') as string,
+          lineOfBusiness: (saved['lineOfBusiness'] ?? '') as string,
+          startDate:      saved['startDate'] ? new Date(saved['startDate'] as string) : null,
+          endDate:        saved['endDate']   ? new Date(saved['endDate']   as string) : null,
+          minPremium:     (saved['minPremium'] ?? 0) as number,
+        }, { emitEvent: true });
+      }
     }
 
     const changes$ = this.filterForm.valueChanges.pipe(takeUntil(this.destroy$));
@@ -84,8 +102,18 @@ export class PolicyFilter implements OnDestroy {
       });
     });
 
-    // ── 3. Debounced URL write ────────────────────────────────────────────────
+    // ── 3. Debounced URL write + localStorage persist ─────────────────────────
     changes$.pipe(debounceTime(400)).subscribe(f => {
+      this.storage.set(PolicyFilter.STORAGE_KEY, {
+        searchTerm:     f.searchTerm      ?? '',
+        status:         f.status          ?? '',
+        region:         f.region          ?? '',
+        lineOfBusiness: f.lineOfBusiness  ?? '',
+        startDate:      f.startDate ? this.toDateParam(f.startDate) : null,
+        endDate:        f.endDate   ? this.toDateParam(f.endDate)   : null,
+        minPremium:     f.minPremium ?? 0,
+      });
+
       this.router.navigate([], {
         relativeTo:          this.route,
         queryParams: {

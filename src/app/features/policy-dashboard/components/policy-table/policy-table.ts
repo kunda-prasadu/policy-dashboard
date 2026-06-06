@@ -7,6 +7,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { StorageService } from '../../../../core/services/storage.service';
 
 @Component({
   selector: 'app-policy-table',
@@ -17,9 +18,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class PolicyTable {
   readonly store = inject(PolicyStore);
+  private readonly storage = inject(StorageService);
+
+  private static readonly PAGE_SIZE_KEY = 'policy-page-size';
+  private static readonly DEFAULT_PAGE_SIZE = 10;
 
   displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'status', 'region', 'premium', 'flagged'];
   dataSource = new MatTableDataSource<any>();
+  readonly initialPageSize = this.storage.get<number>(PolicyTable.PAGE_SIZE_KEY) ?? PolicyTable.DEFAULT_PAGE_SIZE;
 
   sort = viewChild(MatSort);
   paginator = viewChild(MatPaginator);
@@ -36,7 +42,12 @@ export class PolicyTable {
     const sort = this.sort();
     const paginator = this.paginator();
     if (sort) this.dataSource.sort = sort;
-    if (paginator) this.dataSource.paginator = paginator;
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+      paginator.page.subscribe(e => {
+        this.storage.set(PolicyTable.PAGE_SIZE_KEY, e.pageSize);
+      });
+    }
   }
 
   toggleSelection(policyId: string): void  {

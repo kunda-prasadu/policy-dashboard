@@ -1,4 +1,5 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, effect, inject } from '@angular/core';
+import { StorageService } from './storage.service';
 
 export type Theme = 'light' | 'dark';
 
@@ -6,6 +7,7 @@ const STORAGE_KEY = 'preferred-theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private readonly storage = inject(StorageService);
   private readonly _theme = signal<Theme>(this.resolveInitialTheme());
 
   readonly theme = this._theme.asReadonly();
@@ -16,11 +18,7 @@ export class ThemeService {
       const theme = this._theme();
       document.documentElement.classList.toggle('dark-theme', theme === 'dark');
       document.documentElement.style.colorScheme = theme;
-      try {
-        localStorage.setItem(STORAGE_KEY, theme);
-      } catch {
-        // localStorage unavailable (SSR / private mode)
-      }
+      this.storage.set(STORAGE_KEY, theme);
     });
   }
 
@@ -33,12 +31,8 @@ export class ThemeService {
   }
 
   private resolveInitialTheme(): Theme {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-      if (stored === 'light' || stored === 'dark') return stored;
-    } catch {
-      // localStorage unavailable
-    }
+    const stored = this.storage.get<Theme>(STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark') return stored;
     return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 }

@@ -9,8 +9,8 @@
       <mat-icon class="filter-panel__title-icon">tune</mat-icon>
       Advanced Filters
     </span>
-    <button mat-icon-button class="filter-panel__close" (click)="close()">
-      <mat-icon>close</mat-icon>
+    <button mat-icon-button class="filter-panel__close" (click)="close()" aria-label="Close filters">
+      <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
 
@@ -25,17 +25,19 @@
       </h3>
       <div class="fp-date-row">
         <div class="fp-date-col">
-          <span class="fp-label">START DATE</span>
+          <span class="fp-label" id="start-date-label">START DATE</span>
           <mat-form-field appearance="outline" class="fp-field">
-            <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="DD/MM/YYYY">
+            <mat-label>Start date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="DD/MM/YYYY" aria-labelledby="start-date-label">
             <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
             <mat-datepicker #startPicker></mat-datepicker>
           </mat-form-field>
         </div>
         <div class="fp-date-col">
-          <span class="fp-label">END DATE</span>
+          <span class="fp-label" id="end-date-label">END DATE</span>
           <mat-form-field appearance="outline" class="fp-field">
-            <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="DD/MM/YYYY">
+            <mat-label>End date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="DD/MM/YYYY" aria-labelledby="end-date-label">
             <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
             <mat-datepicker #endPicker></mat-datepicker>
           </mat-form-field>
@@ -46,7 +48,7 @@
     <!-- Status -->
     <section class="fp-section">
       <h3 class="fp-section__title">Status</h3>
-      <mat-button-toggle-group formControlName="status" class="fp-toggle-group" hideSingleSelectionIndicator>
+      <mat-button-toggle-group formControlName="status" class="fp-toggle-group" hideSingleSelectionIndicator aria-label="Filter by status">
         <mat-button-toggle value="">All</mat-button-toggle>
         @for (s of statuses; track s) {
           <mat-button-toggle [value]="s">{{ s }}</mat-button-toggle>
@@ -57,7 +59,7 @@
     <!-- Line of Business -->
     <section class="fp-section">
       <h3 class="fp-section__title">Line of Business</h3>
-      <mat-button-toggle-group formControlName="lineOfBusiness" class="fp-toggle-group" hideSingleSelectionIndicator>
+      <mat-button-toggle-group formControlName="lineOfBusiness" class="fp-toggle-group" hideSingleSelectionIndicator aria-label="Filter by line of business">
         <mat-button-toggle value="">All</mat-button-toggle>
         @for (lob of lobs; track lob) {
           <mat-button-toggle [value]="lob">{{ lob }}</mat-button-toggle>
@@ -82,7 +84,7 @@
     <!-- Minimum Premium -->
     <section class="fp-section">
       <h3 class="fp-section__title">Minimum Premium</h3>
-      <mat-slider min="0" max="1000000" step="10000" class="fp-slider">
+      <mat-slider min="0" max="1000000" step="10000" class="fp-slider" aria-label="Minimum premium">
         <input matSliderThumb formControlName="minPremium">
       </mat-slider>
       <div class="fp-slider-labels">
