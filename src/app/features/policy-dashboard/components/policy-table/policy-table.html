@@ -1,11 +1,12 @@
-<table mat-table [dataSource]="dataSource" matSort class="policy-table">
+<table mat-table [dataSource]="dataSource" matSort class="policy-table"
+       aria-label="Policy data table">
     <!-- Select Checkbox -->
     <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="toggleSelectAll()"></mat-checkbox>
+            <mat-checkbox (change)="toggleSelectAll()" aria-label="Select all policies"></mat-checkbox>
         </th>
         <td mat-cell *matCellDef="let policy">
-            <mat-checkbox (change)="store.toggleSelection(policy.id)" [checked]="store.selectedPolicyIds().includes(policy.id)"></mat-checkbox>
+            <mat-checkbox (change)="store.toggleSelection(policy.id)" [checked]="store.selectedPolicyIds().includes(policy.id)" [attr.aria-label]="'Select policy ' + policy.policyNumber"></mat-checkbox>
         </td>
     </ng-container>
     <!-- Policy Number Column -->
@@ -44,11 +45,11 @@
     <!-- Flagged Column -->
     <ng-container matColumnDef="flagged">
         <th mat-header-cell *matHeaderCellDef class="col-flagged">
-          <mat-icon class="col-flag-header" matTooltip="Flagged for Review">flag</mat-icon>
+          <mat-icon class="col-flag-header" matTooltip="Flagged for Review" aria-hidden="true">flag</mat-icon>
         </th>
         <td mat-cell *matCellDef="let policy" class="col-flagged">
           @if(policy.flaggedForReview) {
-            <mat-icon class="flag-icon--on" matTooltip="Flagged for review">flag</mat-icon>
+            <mat-icon class="flag-icon--on" matTooltip="Flagged for review" aria-hidden="true">flag</mat-icon>
           }
         </td>
     </ng-container>
@@ -59,7 +60,7 @@
 <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
 
 @if(store.filteredPolicies().length === 0) {
-  <div class="empty-state">
+  <div class="empty-state" role="status" aria-live="polite">
     <mat-icon class="empty-state__icon">search_off</mat-icon>
     <p class="empty-state__text">No policies match the current filters.</p>
   </div>

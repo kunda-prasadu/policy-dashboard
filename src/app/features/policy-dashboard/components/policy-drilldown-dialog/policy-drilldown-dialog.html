@@ -1,14 +1,14 @@
-<div class="drilldown">
+<div class="drilldown" role="dialog" [attr.aria-label]="dialogTitle">
 
   <!-- Header -->
   <div class="drilldown__header" [style.border-color]="meta.color">
-    <div class="drilldown__title">
-      <mat-icon [style.color]="meta.color">{{ meta.icon }}</mat-icon>
+    <div class="drilldown__title" id="drilldown-title">
+      <mat-icon [style.color]="meta.color" aria-hidden="true">{{ meta.icon }}</mat-icon>
       <span>{{ dialogTitle }}</span>
       <span class="drilldown__count" [style.background]="meta.color">{{ policies().length }}</span>
     </div>
-    <button mat-icon-button (click)="close()" class="drilldown__close">
-      <mat-icon>close</mat-icon>
+    <button mat-icon-button (click)="close()" class="drilldown__close" aria-label="Close dialog">
+      <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
 
@@ -20,7 +20,7 @@
         <p>No matching policies found</p>
       </div>
     } @else {
-      <table mat-table [dataSource]="policies()" class="drilldown-table">
+      <table mat-table [dataSource]="policies()" class="drilldown-table" [attr.aria-label]="dialogTitle + ' policies'">
 
         <!-- Days Left (expiring mode only) -->
         <ng-container matColumnDef="daysLeft">
@@ -84,7 +84,7 @@
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let p" class="cell-flag">
             @if (p.flaggedForReview) {
-              <mat-icon class="flag-icon" matTooltip="Flagged for review">flag</mat-icon>
+              <mat-icon class="flag-icon" matTooltip="Flagged for review" aria-hidden="true">flag</mat-icon>
             }
           </td>
         </ng-container>
@@ -96,11 +96,12 @@
             <button mat-stroked-button class="renew-btn"
               [disabled]="renewingIds().has(p.id)"
               (click)="renew(p.id)"
+              [attr.aria-label]="'Renew policy ' + p.policyNumber"
               matTooltip="Renew policy — set status to Active">
               @if (renewingIds().has(p.id)) {
-                <mat-progress-spinner diameter="14" mode="indeterminate" strokeWidth="2" />
+                <mat-progress-spinner diameter="14" mode="indeterminate" strokeWidth="2" aria-label="Renewing…" />
               } @else {
-                <mat-icon>autorenew</mat-icon>
+                <mat-icon aria-hidden="true">autorenew</mat-icon>
               }
               Renew
             </button>
