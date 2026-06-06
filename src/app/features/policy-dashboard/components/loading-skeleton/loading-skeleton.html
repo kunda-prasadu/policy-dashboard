@@ -1,35 +1,15 @@
 <div class="skeleton-wrap">
 
-  <!-- Summary cards -->
   <div class="skeleton-summary">
-    <div class="skeleton-card">
-      <div class="shimmer skeleton-card__icon"></div>
-      <div class="skeleton-card__lines">
-        <div class="shimmer skeleton-card__count"></div>
-        <div class="shimmer skeleton-card__label"></div>
+    @for (card of [1,2,3,4]; track card) {
+      <div class="skeleton-card">
+        <div class="skeleton-card__lines">
+          <div class="shimmer skeleton-card__label"></div>
+          <div class="shimmer skeleton-card__count"></div>
+        </div>
+        <div class="shimmer skeleton-card__icon"></div>
       </div>
-    </div>
-    <div class="skeleton-card">
-      <div class="shimmer skeleton-card__icon"></div>
-      <div class="skeleton-card__lines">
-        <div class="shimmer skeleton-card__count"></div>
-        <div class="shimmer skeleton-card__label"></div>
-      </div>
-    </div>
-    <div class="skeleton-card">
-      <div class="shimmer skeleton-card__icon"></div>
-      <div class="skeleton-card__lines">
-        <div class="shimmer skeleton-card__count"></div>
-        <div class="shimmer skeleton-card__label"></div>
-      </div>
-    </div>
-    <div class="skeleton-card">
-      <div class="shimmer skeleton-card__icon"></div>
-      <div class="skeleton-card__lines">
-        <div class="shimmer skeleton-card__count"></div>
-        <div class="shimmer skeleton-card__label"></div>
-      </div>
-    </div>
+    }
   </div>
 
   <!-- Filter bar -->

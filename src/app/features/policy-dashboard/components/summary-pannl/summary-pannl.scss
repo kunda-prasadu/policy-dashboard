@@ -4,16 +4,14 @@
 
 .summary-section {
   &__title {
-    margin: 0 0 16px;
+    margin: 0 0 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--mat-sys-on-surface-variant);
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    font-size: 11px;
 
-    &--spaced {
-      margin-top: 28px;
-    }
+    &--spaced { margin-top: 28px; }
   }
 }
 
@@ -35,116 +33,158 @@
   }
 }
 
+// ─── Card ───────────────────────────────────────────────────────────────────────
 .summary-card {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding: 20px 24px;
-  border-radius: 12px;
-  background: var(--mat-sys-surface-container-low);
+  padding: 20px 22px 20px 26px;   // extra left room for accent bar
+  border-radius: 16px;
+  background: var(--mat-sys-surface);
   border: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
+  // ── Left accent bar ──
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    border-radius: 16px 0 0 16px;
+  }
+
   &:hover {
-    box-shadow: var(--mat-sys-level2);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
     transform: translateY(-2px);
   }
 
-  &__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    mat-icon {
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
-    }
-  }
-
-  &__body {
+  // ─ left: label → count → sub
+  &__content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     min-width: 0;
-  }
-
-  &__count {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--mat-sys-on-surface);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
   }
 
   &__label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--mat-sys-on-surface-variant);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  &--active .summary-card__icon {
-    background: #e6f4ea;
-    color: #1e7e34;
+  &__count {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--mat-sys-on-surface);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1.5px;
+    margin: 2px 0;
   }
 
-  &--pending .summary-card__icon {
-    background: #fff8e1;
-    color: #f57c00;
+  &__sub {
+    font-size: 11px;
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.7;
+    font-weight: 400;
+
+    &--warn {
+      color: #c2410c;
+      opacity: 1;
+      font-weight: 600;
+    }
   }
 
-  &--expired .summary-card__icon {
-    background: #fce4ec;
-    color: #c62828;
+  // ─ right: icon in gradient rounded square
+  &__icon {
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+    }
   }
 
-  &--cancelled .summary-card__icon {
-    background: #f3e5f5;
-    color: #6a1b9a;
+  // ── Status: gradient-fill icon + matching accent ──
+  &--active {
+    &::before { background: linear-gradient(180deg, #34d399, #059669); }
+    .summary-card__icon {
+      background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
+      color: #fff;
+    }
+  }
+  &--pending {
+    &::before { background: linear-gradient(180deg, #fcd34d, #f59e0b); }
+    .summary-card__icon {
+      background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+      color: #fff;
+    }
+  }
+  &--expired {
+    &::before { background: linear-gradient(180deg, #fca5a5, #ef4444); }
+    .summary-card__icon {
+      background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+      color: #fff;
+    }
+  }
+  &--cancelled {
+    &::before { background: linear-gradient(180deg, #c4b5fd, #8b5cf6); }
+    .summary-card__icon {
+      background: linear-gradient(135deg, #ddd6fe 0%, #8b5cf6 100%);
+      color: #fff;
+    }
   }
 
-  // Key Metrics row
-  &--expiring .summary-card__icon {
-    background: #fff3e0;
-    color: #e65100;
+  // ── Metrics: soft tint icon + matching accent ──
+  &--expiring {
+    &::before { background: linear-gradient(180deg, #fdba74, #f97316); }
+    .summary-card__icon { background: rgba(249, 115, 22, 0.10); color: #c2410c; }
   }
-
-  &--property .summary-card__icon {
-    background: #e3f2fd;
-    color: #1565c0;
+  &--property {
+    &::before { background: linear-gradient(180deg, #7dd3fc, #0ea5e9); }
+    .summary-card__icon { background: rgba(14, 165, 233, 0.10); color: #0369a1; }
   }
-
-  &--casualty .summary-card__icon {
-    background: #f1f8e9;
-    color: #2e7d32;
+  &--casualty {
+    &::before { background: linear-gradient(180deg, #6ee7b7, #10b981); }
+    .summary-card__icon { background: rgba(16, 185, 129, 0.10); color: #047857; }
   }
-
-  &--ah .summary-card__icon {
-    background: #fce4ec;
-    color: #ad1457;
+  &--ah {
+    &::before { background: linear-gradient(180deg, #f9a8d4, #ec4899); }
+    .summary-card__icon { background: rgba(236, 72, 153, 0.10); color: #be185d; }
   }
-
-  &--marine .summary-card__icon {
-    background: #e0f7fa;
-    color: #00695c;
+  &--marine {
+    &::before { background: linear-gradient(180deg, #a5b4fc, #6366f1); }
+    .summary-card__icon { background: rgba(99, 102, 241, 0.10); color: #4338ca; }
   }
 }
 
-// Dark theme overrides
+// ─── Dark theme overrides ────────────────────────────────────────────────────────
 :host-context(html.dark-theme) {
-  .summary-card--active .summary-card__icon    { background: rgba(30, 126, 52, 0.2);   color: #81c995; }
-  .summary-card--pending .summary-card__icon   { background: rgba(245, 124, 0, 0.2);   color: #ffb74d; }
-  .summary-card--expired .summary-card__icon   { background: rgba(198, 40, 40, 0.2);   color: #ef9a9a; }
-  .summary-card--cancelled .summary-card__icon { background: rgba(106, 27, 154, 0.2);  color: #ce93d8; }
-  .summary-card--expiring .summary-card__icon  { background: rgba(230, 81, 0, 0.2);    color: #ffcc80; }
-  .summary-card--property .summary-card__icon  { background: rgba(21, 101, 192, 0.2);  color: #90caf9; }
-  .summary-card--casualty .summary-card__icon  { background: rgba(46, 125, 50, 0.2);   color: #a5d6a7; }
-  .summary-card--ah .summary-card__icon        { background: rgba(173, 20, 87, 0.2);   color: #f48fb1; }
-  .summary-card--marine .summary-card__icon    { background: rgba(0, 105, 92, 0.2);    color: #80cbc4; }
+  .summary-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.20), 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .summary-card__sub--warn { color: #fb923c; }
+
+  // Gradient icons remain unchanged (they pop in dark mode naturally)
+  .summary-card--expiring  .summary-card__icon { background: rgba(249, 115, 22, 0.18); color: #fdba74; }
+  .summary-card--property  .summary-card__icon { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; }
+  .summary-card--casualty  .summary-card__icon { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+  .summary-card--ah        .summary-card__icon { background: rgba(236, 72, 153, 0.18); color: #f9a8d4; }
+  .summary-card--marine    .summary-card__icon { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; }
 }

@@ -6,6 +6,27 @@ table {
   width: 100%;
 }
 
+// Force row heights — MDC ignores CSS custom properties scoped to :host
+::ng-deep .policy-table {
+  .mat-mdc-row {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+  }
+
+  .mat-mdc-header-row {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+  }
+
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
 .mat-mdc-row {
   transition: background-color 0.15s ease;
 
@@ -24,30 +45,34 @@ table {
     text-transform: uppercase;
     letter-spacing: 0.6px;
     font-size: 11px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
 .mat-mdc-cell {
   font: var(--mat-sys-body-medium);
   color: var(--mat-sys-on-surface);
-  padding: 14px 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  line-height: 1.4;
 }
 
 // Status badge
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 2px 8px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.3px;
   text-transform: uppercase;
 
   &__dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: currentColor;
     flex-shrink: 0;
@@ -135,10 +160,9 @@ mat-paginator {
   letter-spacing: 0.2px;
 }
 
-// Premium two-line display
+// Premium — amount + currency on one line
 .cell-premium {
   .premium-amount {
-    display: block;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: var(--mat-sys-on-surface);
@@ -150,6 +174,7 @@ mat-paginator {
     color: var(--mat-sys-on-surface-variant);
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    margin-left: 3px;
   }
 }
 

@@ -5,35 +5,39 @@
   <div class="summary-grid summary-grid--4">
 
     <div class="summary-card summary-card--active">
-      <div class="summary-card__icon"><mat-icon>check_circle</mat-icon></div>
-      <div class="summary-card__body">
+      <div class="summary-card__content">
+        <span class="summary-card__label">Active Policies</span>
         <span class="summary-card__count">{{ summary().activeCount }}</span>
-        <span class="summary-card__label">Active</span>
+        <span class="summary-card__sub">currently in force</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>task_alt</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--pending">
-      <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
-      <div class="summary-card__body">
+      <div class="summary-card__content">
+        <span class="summary-card__label">Pending Policies</span>
         <span class="summary-card__count">{{ summary().pendingCount }}</span>
-        <span class="summary-card__label">Pending</span>
+        <span class="summary-card__sub">awaiting approval</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--expired">
-      <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
-      <div class="summary-card__body">
+      <div class="summary-card__content">
+        <span class="summary-card__label">Expired Policies</span>
         <span class="summary-card__count">{{ summary().expiredCount }}</span>
-        <span class="summary-card__label">Expired</span>
+        <span class="summary-card__sub">past coverage end</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--cancelled">
-      <div class="summary-card__icon"><mat-icon>cancel</mat-icon></div>
-      <div class="summary-card__body">
+      <div class="summary-card__content">
+        <span class="summary-card__label">Cancelled Policies</span>
         <span class="summary-card__count">{{ summary().cancelledCount }}</span>
-        <span class="summary-card__label">Cancelled</span>
+        <span class="summary-card__sub">terminated policies</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>cancel</mat-icon></div>
     </div>
 
   </div>
@@ -43,43 +47,48 @@
   <div class="summary-grid summary-grid--5">
 
     <div class="summary-card summary-card--expiring">
-      <div class="summary-card__icon"><mat-icon>notifications_active</mat-icon></div>
-      <div class="summary-card__body">
-        <span class="summary-card__count">{{ summary().expiringWithin30Days }}</span>
+      <div class="summary-card__content">
         <span class="summary-card__label">Expiring in 30 Days</span>
+        <span class="summary-card__count">{{ summary().expiringWithin30Days }}</span>
+        <span class="summary-card__sub summary-card__sub--warn">action required</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>notifications_active</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--property">
-      <div class="summary-card__icon"><mat-icon>home_work</mat-icon></div>
-      <div class="summary-card__body">
-        <span class="summary-card__count">{{ formatPremium(summary().propertyPremium) }}</span>
+      <div class="summary-card__content">
         <span class="summary-card__label">Property GWP</span>
+        <span class="summary-card__count">{{ formatPremium(summary().propertyPremium) }}</span>
+        <span class="summary-card__sub">gross written premium</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>home_work</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--casualty">
-      <div class="summary-card__icon"><mat-icon>security</mat-icon></div>
-      <div class="summary-card__body">
-        <span class="summary-card__count">{{ formatPremium(summary().casualtyPremium) }}</span>
+      <div class="summary-card__content">
         <span class="summary-card__label">Casualty GWP</span>
+        <span class="summary-card__count">{{ formatPremium(summary().casualtyPremium) }}</span>
+        <span class="summary-card__sub">gross written premium</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>security</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--ah">
-      <div class="summary-card__icon"><mat-icon>favorite</mat-icon></div>
-      <div class="summary-card__body">
-        <span class="summary-card__count">{{ formatPremium(summary().ahPremium) }}</span>
+      <div class="summary-card__content">
         <span class="summary-card__label">A&amp;H GWP</span>
+        <span class="summary-card__count">{{ formatPremium(summary().ahPremium) }}</span>
+        <span class="summary-card__sub">gross written premium</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>favorite</mat-icon></div>
     </div>
 
     <div class="summary-card summary-card--marine">
-      <div class="summary-card__icon"><mat-icon>anchor</mat-icon></div>
-      <div class="summary-card__body">
-        <span class="summary-card__count">{{ formatPremium(summary().marinePremium) }}</span>
+      <div class="summary-card__content">
         <span class="summary-card__label">Marine GWP</span>
+        <span class="summary-card__count">{{ formatPremium(summary().marinePremium) }}</span>
+        <span class="summary-card__sub">gross written premium</span>
       </div>
+      <div class="summary-card__icon"><mat-icon>anchor</mat-icon></div>
     </div>
 
   </div>
