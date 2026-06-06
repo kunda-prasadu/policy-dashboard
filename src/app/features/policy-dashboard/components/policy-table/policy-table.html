@@ -1,6 +1,7 @@
 <table>
     <thead>
         <tr>
+            <th>Select</th>
             <th>Policy Number</th>
             <th>Policy Holder</th>
             <th>Status</th>
@@ -10,6 +11,9 @@
     <tbody>
         @for(policy of store.filteredPolicies(); track policy.id){
             <tr>
+                <td>
+                    <input type="checkbox" [checked]="store.selectedPolicyIds().includes(policy.id)" (change)="store.toggleSelection(policy.id)">
+                </td>
                 <td>{{ policy.policyNumber }}</td>
                 <td>{{ policy.policyHolderName }}</td>
                 <td>{{ policy.status }}</td>

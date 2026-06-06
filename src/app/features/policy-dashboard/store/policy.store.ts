@@ -35,13 +35,24 @@ export class PolicyStore {
         const filters = this.filters();
 
         return policies.filter(policy =>{
-            const matchesSearch = !filters.searchTerm || policy.policyNumber.toLocaleLowerCase().includes(filters.searchTerm.toLocaleLowerCase());
+            const searchText = filters.searchTerm?.toLocaleLowerCase() ?? '';
+            const matchesSearch = !searchText || policy.policyNumber.toLocaleLowerCase().includes(searchText) || policy.policyHolderName.toLocaleLowerCase().includes(searchText) || policy.underwriter.toLocaleLowerCase().includes(searchText);
             const matchesStatus = !filters.status || policy.status === filters.status;
             const matchesRegion = !filters.region || policy.region === filters.region;
             const matchesLOB = !filters.lineOfBusiness || policy.lineOfBusiness === filters.lineOfBusiness;
 
             return matchesSearch && matchesStatus && matchesRegion && matchesLOB;
         })
+    })
+
+    readonly summary = computed(() => {
+        const policies = this.filteredPolicies();
+        return {
+            activeCount: policies.filter(p => p.status === 'Active').length,
+            expiredCount: policies.filter(p => p.status === 'Expired').length,
+            pendingCount: policies.filter(p => p.status === 'Pending').length,
+            cancelledCount: policies.filter(p => p.status === 'Cancelled').length,
+        }
     })
 
     loadingPolicies():void {

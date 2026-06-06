@@ -20,4 +20,6 @@ export class SummaryPannl {
 
     readonly cancelledCount = computed(() => this.store.policies().filter((p: Policy) => p.status === 'Cancelled').length);
 
+    readonly summary = this.store.summary;
+
 }
