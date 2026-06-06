@@ -47,11 +47,20 @@ export class PolicyStore {
 
     readonly summary = computed(() => {
         const policies = this.filteredPolicies();
+        const today = new Date();
+        const next30Days = new Date();
+        next30Days.setDate(today.getDate() + 30);
+
         return {
             activeCount: policies.filter(p => p.status === 'Active').length,
             expiredCount: policies.filter(p => p.status === 'Expired').length,
             pendingCount: policies.filter(p => p.status === 'Pending').length,
             cancelledCount: policies.filter(p => p.status === 'Cancelled').length,
+            propertyPremium: policies.filter(p => p.lineOfBusiness === 'Property').reduce((sum, p) => sum + p.premiumAmount, 0),
+            casualtyPremium: policies.filter(p => p.lineOfBusiness === 'Casualty').reduce((sum, p) => sum + p.premiumAmount, 0),
+            ahPremium: policies.filter(p => p.lineOfBusiness === 'A&H').reduce((sum, p) => sum + p.premiumAmount, 0),
+            marinePremium: policies.filter(p => p.lineOfBusiness === 'Marine').reduce((sum, p) => sum + p.premiumAmount, 0),
+            expiringWithin30Days: policies.filter(p => p.expiryDate >= today && p.expiryDate <= next30Days).length
         }
     })
 
