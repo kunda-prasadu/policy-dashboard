@@ -80,46 +80,46 @@ table {
   }
 
   &--active {
-    background: #e6f4ea;
-    color: #1e7e34;
+    background: #dcfce7;
+    color: #15803d;
   }
 
   &--pending {
-    background: #fff8e1;
-    color: #f57c00;
+    background: #fef9c3;
+    color: #a16207;
   }
 
   &--expired {
-    background: #fce4ec;
-    color: #c62828;
+    background: #fee2e2;
+    color: #b91c1c;
   }
 
   &--cancelled {
-    background: #f3e5f5;
-    color: #6a1b9a;
+    background: #f1f5f9;
+    color: #475569;
   }
 }
 
 // Dark theme badge overrides
 :host-context(html.dark-theme) {
   .status-badge--active {
-    background: rgba(30, 126, 52, 0.2);
-    color: #81c995;
+    background: rgba(21, 128, 61, 0.18);
+    color: #86efac;
   }
 
   .status-badge--pending {
-    background: rgba(245, 124, 0, 0.2);
-    color: #ffb74d;
+    background: rgba(161, 98, 7, 0.18);
+    color: #fde047;
   }
 
   .status-badge--expired {
-    background: rgba(198, 40, 40, 0.2);
-    color: #ef9a9a;
+    background: rgba(185, 28, 28, 0.18);
+    color: #fca5a5;
   }
 
   .status-badge--cancelled {
-    background: rgba(106, 27, 154, 0.2);
-    color: #ce93d8;
+    background: rgba(71, 85, 105, 0.18);
+    color: #94a3b8;
   }
 }
 

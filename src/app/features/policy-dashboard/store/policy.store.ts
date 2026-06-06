@@ -68,6 +68,7 @@ export class PolicyStore {
             casualtyPremium: policies.filter(p => p.lineOfBusiness === 'Casualty').reduce((sum, p) => sum + p.premiumAmount, 0),
             ahPremium: policies.filter(p => p.lineOfBusiness === 'A&H').reduce((sum, p) => sum + p.premiumAmount, 0),
             marinePremium: policies.filter(p => p.lineOfBusiness === 'Marine').reduce((sum, p) => sum + p.premiumAmount, 0),
+            get totalGwp() { return this.propertyPremium + this.casualtyPremium + this.ahPremium + this.marinePremium; },
             expiringWithin30Days: policies.filter(p => {
             const d = new Date(p.expiryDate);
             return d >= today && d <= next30Days;

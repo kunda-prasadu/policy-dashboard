@@ -44,9 +44,10 @@
 
   <!-- Row 2: Key Metrics -->
   <h2 class="summary-section__title summary-section__title--spaced">Key Metrics</h2>
-  <div class="summary-grid summary-grid--5">
+  <div class="metrics-row">
 
-    <div class="summary-card summary-card--expiring">
+    <!-- Expiring soon -->
+    <div class="summary-card summary-card--expiring metrics-expiring">
       <div class="summary-card__content">
         <span class="summary-card__label">Expiring in 30 Days</span>
         <span class="summary-card__count">{{ summary().expiringWithin30Days }}</span>
@@ -55,40 +56,68 @@
       <div class="summary-card__icon"><mat-icon>notifications_active</mat-icon></div>
     </div>
 
-    <div class="summary-card summary-card--property">
-      <div class="summary-card__content">
-        <span class="summary-card__label">Property GWP</span>
-        <span class="summary-card__count">{{ formatPremium(summary().propertyPremium) }}</span>
-        <span class="summary-card__sub">gross written premium</span>
+    <!-- GWP by LOB — progress bar card -->
+    <div class="gwp-card">
+      <div class="gwp-card__header">
+        <span class="gwp-card__title">GWP by Line of Business</span>
+        <span class="gwp-card__total">{{ formatPremium(summary().totalGwp) }} total</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>home_work</mat-icon></div>
-    </div>
 
-    <div class="summary-card summary-card--casualty">
-      <div class="summary-card__content">
-        <span class="summary-card__label">Casualty GWP</span>
-        <span class="summary-card__count">{{ formatPremium(summary().casualtyPremium) }}</span>
-        <span class="summary-card__sub">gross written premium</span>
-      </div>
-      <div class="summary-card__icon"><mat-icon>security</mat-icon></div>
-    </div>
+      <div class="gwp-card__rows">
 
-    <div class="summary-card summary-card--ah">
-      <div class="summary-card__content">
-        <span class="summary-card__label">A&amp;H GWP</span>
-        <span class="summary-card__count">{{ formatPremium(summary().ahPremium) }}</span>
-        <span class="summary-card__sub">gross written premium</span>
-      </div>
-      <div class="summary-card__icon"><mat-icon>favorite</mat-icon></div>
-    </div>
+        <div class="gwp-row gwp-row--property">
+          <div class="gwp-row__meta">
+            <span class="gwp-row__lob">
+              <mat-icon>home_work</mat-icon> Property
+            </span>
+            <span class="gwp-row__value">{{ formatPremium(summary().propertyPremium) }}</span>
+          </div>
+          <div class="gwp-row__track">
+            <div class="gwp-row__bar" [style.width]="barPct(summary().propertyPremium, summary().totalGwp)"></div>
+          </div>
+          <span class="gwp-row__pct">{{ barPct(summary().propertyPremium, summary().totalGwp) }}</span>
+        </div>
 
-    <div class="summary-card summary-card--marine">
-      <div class="summary-card__content">
-        <span class="summary-card__label">Marine GWP</span>
-        <span class="summary-card__count">{{ formatPremium(summary().marinePremium) }}</span>
-        <span class="summary-card__sub">gross written premium</span>
+        <div class="gwp-row gwp-row--casualty">
+          <div class="gwp-row__meta">
+            <span class="gwp-row__lob">
+              <mat-icon>security</mat-icon> Casualty
+            </span>
+            <span class="gwp-row__value">{{ formatPremium(summary().casualtyPremium) }}</span>
+          </div>
+          <div class="gwp-row__track">
+            <div class="gwp-row__bar" [style.width]="barPct(summary().casualtyPremium, summary().totalGwp)"></div>
+          </div>
+          <span class="gwp-row__pct">{{ barPct(summary().casualtyPremium, summary().totalGwp) }}</span>
+        </div>
+
+        <div class="gwp-row gwp-row--ah">
+          <div class="gwp-row__meta">
+            <span class="gwp-row__lob">
+              <mat-icon>favorite</mat-icon> A&amp;H
+            </span>
+            <span class="gwp-row__value">{{ formatPremium(summary().ahPremium) }}</span>
+          </div>
+          <div class="gwp-row__track">
+            <div class="gwp-row__bar" [style.width]="barPct(summary().ahPremium, summary().totalGwp)"></div>
+          </div>
+          <span class="gwp-row__pct">{{ barPct(summary().ahPremium, summary().totalGwp) }}</span>
+        </div>
+
+        <div class="gwp-row gwp-row--marine">
+          <div class="gwp-row__meta">
+            <span class="gwp-row__lob">
+              <mat-icon>anchor</mat-icon> Marine
+            </span>
+            <span class="gwp-row__value">{{ formatPremium(summary().marinePremium) }}</span>
+          </div>
+          <div class="gwp-row__track">
+            <div class="gwp-row__bar" [style.width]="barPct(summary().marinePremium, summary().totalGwp)"></div>
+          </div>
+          <span class="gwp-row__pct">{{ barPct(summary().marinePremium, summary().totalGwp) }}</span>
+        </div>
+
       </div>
-      <div class="summary-card__icon"><mat-icon>anchor</mat-icon></div>
     </div>
 
   </div>

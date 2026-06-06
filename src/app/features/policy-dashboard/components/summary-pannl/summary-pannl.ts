@@ -19,4 +19,10 @@ export class SummaryPannl {
     if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;
     return `$${value}`;
   }
+
+  /** Returns width % of a LOB value vs total GWP (min 2% so bar is always visible) */
+  barPct(value: number, total: number): string {
+    if (!total) return '0%';
+    return `${Math.max(2, Math.round((value / total) * 100))}%`;
+  }
 }
