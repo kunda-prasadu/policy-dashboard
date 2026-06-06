@@ -81,3 +81,15 @@ html.dark-theme .snack-flag-success {
     background-color: #0f2e11 !important;
   }
 }
+
+// ─── Advanced Filters bottom sheet ───────────────────────────────────────────
+.filter-bottom-sheet .mat-bottom-sheet-container {
+  padding: 0 !important;
+  border-radius: 20px 20px 0 0 !important;
+  max-height: 92vh !important;
+  overflow: hidden !important;
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.15) !important;
+  width: 95vw !important;
+  max-width: 95vw !important;
+  margin: 0 auto !important;
+}

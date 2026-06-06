@@ -7,4 +7,5 @@ export interface PolicyFilter {
   region?: Region | '';
   startDate?: Date;
   endDate?: Date;
+  minPremium?: number;
 }

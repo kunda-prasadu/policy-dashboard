@@ -1,41 +1,36 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { PolicyStore } from '../../store/policy.store';
 import { PolicyStatus, Region, LineOfBussiness } from '../../models/policy.model';
-import { POLICY_STATUSES, REGIONS, LINE_OF_BUSINESS } from '../../constants/policy.constants';
+import { FilterPanel } from '../filter-panel/filter-panel';
 
 @Component({
   selector: 'app-policy-filter',
   standalone: true,
-  providers: [provideNativeDateAdapter()],
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatButtonModule, MatOptionModule,
-    MatDatepickerModule, MatIconModule,
+    MatFormFieldModule, MatInputModule,
+    MatButtonModule, MatIconModule,
+    MatBadgeModule, MatBottomSheetModule,
   ],
   templateUrl: './policy-filter.html',
   styleUrls: ['./policy-filter.scss'],
 })
 export class PolicyFilter implements OnDestroy {
-  private readonly fb       = inject(FormBuilder);
-  private readonly router   = inject(Router);
-  private readonly route    = inject(ActivatedRoute);
-  readonly store            = inject(PolicyStore);
-  private readonly destroy$ = new Subject<void>();
-
-  readonly statuses       = POLICY_STATUSES;
-  readonly regions        = REGIONS;
-  readonly lineOfBusiness = LINE_OF_BUSINESS;
+  private readonly fb          = inject(FormBuilder);
+  private readonly router      = inject(Router);
+  private readonly route       = inject(ActivatedRoute);
+  private readonly bottomSheet = inject(MatBottomSheet);
+  readonly store               = inject(PolicyStore);
+  private readonly destroy$    = new Subject<void>();
 
   readonly filterForm = this.fb.group({
     searchTerm:     [''],
@@ -44,6 +39,20 @@ export class PolicyFilter implements OnDestroy {
     lineOfBusiness: [''],
     startDate:      [null as Date | null],
     endDate:        [null as Date | null],
+    minPremium:     [0],
+  });
+
+  /** Count of active advanced filters (excluding search) */
+  readonly activeFilterCount = computed(() => {
+    const f = this.store.filters();
+    let count = 0;
+    if (f.status)         count++;
+    if (f.region)         count++;
+    if (f.lineOfBusiness) count++;
+    if (f.startDate)      count++;
+    if (f.endDate)        count++;
+    if (f.minPremium && f.minPremium > 0) count++;
+    return count;
   });
 
   constructor() {
@@ -65,12 +74,13 @@ export class PolicyFilter implements OnDestroy {
     // ── 2. Immediate store update ─────────────────────────────────────────────
     changes$.subscribe(f => {
       this.store.updateFilters({
-        searchTerm:     f.searchTerm     ?? '',
-        status:         (f.status        ?? '') as PolicyStatus | '',
-        region:         (f.region        ?? '') as Region | '',
-        lineOfBusiness: (f.lineOfBusiness ?? '') as LineOfBussiness | '',
-        startDate:      f.startDate ?? undefined,
-        endDate:        f.endDate   ?? undefined,
+        searchTerm:     f.searchTerm      ?? '',
+        status:         (f.status         ?? '') as PolicyStatus | '',
+        region:         (f.region         ?? '') as Region | '',
+        lineOfBusiness: (f.lineOfBusiness  ?? '') as LineOfBussiness | '',
+        startDate:      f.startDate  ?? undefined,
+        endDate:        f.endDate    ?? undefined,
+        minPremium:     f.minPremium ?? 0,
       });
     });
 
@@ -92,10 +102,40 @@ export class PolicyFilter implements OnDestroy {
     });
   }
 
-  clearFilters(): void {
-    this.filterForm.reset({
-      searchTerm: '', status: '', region: '', lineOfBusiness: '',
-      startDate: null, endDate: null,
+  openFilters(): void {
+    const current = this.filterForm.value;
+    const ref = this.bottomSheet.open(FilterPanel, {
+      data: {
+        startDate:      current.startDate,
+        endDate:        current.endDate,
+        status:         current.status,
+        region:         current.region,
+        lineOfBusiness: current.lineOfBusiness,
+        minPremium:     current.minPremium,
+      },
+      panelClass: 'filter-bottom-sheet',
+    });
+
+    ref.afterDismissed().subscribe(result => {
+      if (!result) return; // dismissed without action (X or backdrop)
+
+      if (result === 'reset') {
+        this.filterForm.reset({
+          searchTerm: this.filterForm.value.searchTerm ?? '', // preserve search
+          status: '', region: '', lineOfBusiness: '',
+          startDate: null, endDate: null, minPremium: 0,
+        });
+        return;
+      }
+
+      this.filterForm.patchValue({
+        status:         result.status         ?? '',
+        region:         result.region         ?? '',
+        lineOfBusiness: result.lineOfBusiness ?? '',
+        startDate:      result.startDate      ?? null,
+        endDate:        result.endDate        ?? null,
+        minPremium:     result.minPremium      ?? 0,
+      });
     });
   }
 
@@ -108,3 +148,4 @@ export class PolicyFilter implements OnDestroy {
     this.destroy$.complete();
   }
 }
+

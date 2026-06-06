@@ -47,8 +47,9 @@ export class PolicyStore {
                 ? new Date(new Date(filters.endDate).setHours(23, 59, 59, 999))
                 : null;
             const matchesDateTo = !endOfDay || expiryDate <= endOfDay;
+            const matchesPremium = !filters.minPremium || policy.premiumAmount >= filters.minPremium;
 
-            return matchesSearch && matchesStatus && matchesRegion && matchesLOB && matchesDateFrom && matchesDateTo;
+            return matchesSearch && matchesStatus && matchesRegion && matchesLOB && matchesDateFrom && matchesDateTo && matchesPremium;
         })
     })
 

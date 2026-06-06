@@ -1,0 +1,103 @@
+<div class="filter-panel" [formGroup]="form">
+
+  <!-- Drag handle -->
+  <div class="filter-panel__handle"></div>
+
+  <!-- Header -->
+  <div class="filter-panel__header">
+    <span class="filter-panel__title">
+      <mat-icon class="filter-panel__title-icon">tune</mat-icon>
+      Advanced Filters
+    </span>
+    <button mat-icon-button class="filter-panel__close" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="filter-panel__body">
+
+    <!-- Policy Expiry Range -->
+    <section class="fp-section">
+      <h3 class="fp-section__title">
+        <mat-icon>calendar_month</mat-icon>
+        Policy Expiry Range
+      </h3>
+      <div class="fp-date-row">
+        <div class="fp-date-col">
+          <span class="fp-label">START DATE</span>
+          <mat-form-field appearance="outline" class="fp-field">
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate" placeholder="DD/MM/YYYY">
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="fp-date-col">
+          <span class="fp-label">END DATE</span>
+          <mat-form-field appearance="outline" class="fp-field">
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate" placeholder="DD/MM/YYYY">
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+    </section>
+
+    <!-- Status -->
+    <section class="fp-section">
+      <h3 class="fp-section__title">Status</h3>
+      <mat-button-toggle-group formControlName="status" class="fp-toggle-group" hideSingleSelectionIndicator>
+        <mat-button-toggle value="">All</mat-button-toggle>
+        @for (s of statuses; track s) {
+          <mat-button-toggle [value]="s">{{ s }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </section>
+
+    <!-- Line of Business -->
+    <section class="fp-section">
+      <h3 class="fp-section__title">Line of Business</h3>
+      <mat-button-toggle-group formControlName="lineOfBusiness" class="fp-toggle-group" hideSingleSelectionIndicator>
+        <mat-button-toggle value="">All</mat-button-toggle>
+        @for (lob of lobs; track lob) {
+          <mat-button-toggle [value]="lob">{{ lob }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </section>
+
+    <!-- Region -->
+    <section class="fp-section">
+      <h3 class="fp-section__title">Region</h3>
+      <mat-form-field appearance="outline" class="fp-field fp-field--full">
+        <mat-label>Select region</mat-label>
+        <mat-select formControlName="region">
+          <mat-option value="">All Regions</mat-option>
+          @for (r of regions; track r) {
+            <mat-option [value]="r">{{ r }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </section>
+
+    <!-- Minimum Premium -->
+    <section class="fp-section">
+      <h3 class="fp-section__title">Minimum Premium</h3>
+      <mat-slider min="0" max="1000000" step="10000" class="fp-slider">
+        <input matSliderThumb formControlName="minPremium">
+      </mat-slider>
+      <div class="fp-slider-labels">
+        <span>$0</span>
+        <span class="fp-slider-value">{{ premiumLabel }}</span>
+        <span>$1M+</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="filter-panel__footer">
+    <button mat-stroked-button class="fp-btn-reset" (click)="reset()">Reset</button>
+    <button mat-flat-button class="fp-btn-apply" (click)="apply()">Apply Filters</button>
+  </div>
+
+</div>
