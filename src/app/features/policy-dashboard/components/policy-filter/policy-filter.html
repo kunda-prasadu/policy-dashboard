@@ -1,36 +1,71 @@
 <form [formGroup]="filterForm">
+
+  <!-- Row 1: search + dropdowns + clear button -->
+  <div class="filter-main">
     <mat-form-field appearance="outline">
-        <mat-label>Search</mat-label>
-        <input matInput formControlName="searchTerm" placeholder="Policy Number / Holder Name">
+      <mat-label>Search</mat-label>
+      <input matInput formControlName="searchTerm" placeholder="Policy No. / Holder / Underwriter">
+      <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
+
     <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
-        <mat-select formControlName="status">
-            <mat-option value="">All</mat-option>
-            @for(status of statuses; track status){
-                <mat-option [value]="status">{{ status }}</mat-option>
-            }
-        </mat-select>
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="">All</mat-option>
+        @for(status of statuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
+
     <mat-form-field appearance="outline">
-        <mat-label>Region</mat-label>
-        <mat-select formControlName="region">
-            <mat-option value="">All</mat-option>
-            @for(region of regions; track region){
-                <mat-option [value]="region">{{ region }}</mat-option>
-            }
-        </mat-select>
+      <mat-label>Region</mat-label>
+      <mat-select formControlName="region">
+        <mat-option value="">All</mat-option>
+        @for(region of regions; track region) {
+          <mat-option [value]="region">{{ region }}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
+
     <mat-form-field appearance="outline">
-        <mat-label>Line of Business</mat-label>
-        <mat-select formControlName="lineOfBusiness">
-            <mat-option value="">All</mat-option>
-            @for(lob of lineOfBusiness; track lob){
-                <mat-option [value]="lob">{{ lob }}</mat-option>
-            }
-        </mat-select>
+      <mat-label>Line of Business</mat-label>
+      <mat-select formControlName="lineOfBusiness">
+        <mat-option value="">All</mat-option>
+        @for(lob of lineOfBusiness; track lob) {
+          <mat-option [value]="lob">{{ lob }}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
+
     <div class="filter-actions">
-        <button mat-stroked-button (click)="clearFilters()">Clear Filters</button>
+      <button mat-stroked-button (click)="clearFilters()">
+        <mat-icon>filter_alt_off</mat-icon>
+        Clear
+      </button>
     </div>
+  </div>
+
+  <!-- Row 2: expiry date range -->
+  <div class="filter-dates">
+    <span class="filter-dates__label">
+      <mat-icon>date_range</mat-icon>
+      Expiry Date Range
+    </span>
+
+    <mat-form-field appearance="outline">
+      <mat-label>From</mat-label>
+      <input matInput [matDatepicker]="fromPicker" formControlName="startDate" placeholder="DD/MM/YYYY">
+      <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>To</mat-label>
+      <input matInput [matDatepicker]="toPicker" formControlName="endDate" placeholder="DD/MM/YYYY">
+      <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+  </div>
+
 </form>

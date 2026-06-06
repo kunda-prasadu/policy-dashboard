@@ -2,22 +2,35 @@
   display: block;
 }
 
-// Hide the hint/error subscript space so form fields don't have dangling whitespace
+// Pierce Material encapsulation to remove subscript gap
 :host ::ng-deep .mat-mdc-form-field-subscript-wrapper {
   display: none !important;
 }
 
+// Compact height tokens for all form fields in this component
+mat-form-field {
+  width: 100%;
+  --mat-form-field-container-height: 42px;
+  --mat-form-field-container-vertical-padding: 9px;
+  --mdc-outlined-text-field-container-height: 42px;
+}
+
 form {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 12px;
-  // align-items: end → button/field bottoms align perfectly;
-  // floating-label zone above the outlined box is irrelevant with this
-  align-items: end;
-  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
   background: var(--mat-sys-surface-container-low);
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 12px;
+  overflow: hidden;
+}
+
+// ── Row 1: dropdowns ────────────────────────────────────────────────────────
+.filter-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  padding: 16px 20px;
 
   @media (max-width: 1100px) {
     grid-template-columns: 1fr 1fr;
@@ -28,14 +41,46 @@ form {
   }
 }
 
-mat-form-field {
-  width: 100%;
-  // Compact height via Angular Material M3 CSS tokens (default is 56px)
-  --mat-form-field-container-height: 42px;
-  --mat-form-field-container-vertical-padding: 9px;
-  --mdc-outlined-text-field-container-height: 42px;
+// ── Row 2: date range ────────────────────────────────────────────────────────
+.filter-dates {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  padding: 10px 20px 14px;
+  background: var(--mat-sys-surface-container);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-bottom: 10px; // align label baseline with field bottom
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  mat-form-field {
+    flex: 0 1 200px;
+  }
+
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    mat-form-field { flex: 1 1 140px; }
+  }
 }
 
+// ── Clear button ─────────────────────────────────────────────────────────────
 .filter-actions {
   display: flex;
   align-items: stretch;
@@ -43,10 +88,19 @@ mat-form-field {
   button {
     height: 42px;
     white-space: nowrap;
-    padding: 0 18px;
+    padding: 0 16px;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+      font-size: 17px;
+      width: 17px;
+      height: 17px;
+    }
   }
 }

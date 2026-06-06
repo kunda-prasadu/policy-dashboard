@@ -6,7 +6,6 @@ import { PolicyTable } from '../../components/policy-table/policy-table';
 import { BulkActionBar } from '../../components/bulk-action-bar/bulk-action-bar';
 import { LoadingSkeleton } from '../../components/loading-skeleton/loading-skeleton';
 import { ErrorState } from '../../components/error-state/error-state';
-import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-policy-dashboard',
@@ -16,8 +15,6 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./policy-dashboard.scss'],
 })
 export class PolicyDashboard implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
   readonly store = inject(PolicyStore);
 
   ngOnInit(): void {

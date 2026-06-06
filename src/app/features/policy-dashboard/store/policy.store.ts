@@ -34,14 +34,21 @@ export class PolicyStore {
         const policies = this.policies();
         const filters = this.filters();
 
-        return policies.filter(policy =>{
+        return policies.filter(policy => {
             const searchText = filters.searchTerm?.toLocaleLowerCase() ?? '';
             const matchesSearch = !searchText || policy.policyNumber.toLocaleLowerCase().includes(searchText) || policy.policyHolderName.toLocaleLowerCase().includes(searchText) || policy.underwriter.toLocaleLowerCase().includes(searchText);
             const matchesStatus = !filters.status || policy.status === filters.status;
             const matchesRegion = !filters.region || policy.region === filters.region;
             const matchesLOB = !filters.lineOfBusiness || policy.lineOfBusiness === filters.lineOfBusiness;
 
-            return matchesSearch && matchesStatus && matchesRegion && matchesLOB;
+            const expiryDate = new Date(policy.expiryDate);
+            const matchesDateFrom = !filters.startDate || expiryDate >= filters.startDate;
+            const endOfDay = filters.endDate
+                ? new Date(new Date(filters.endDate).setHours(23, 59, 59, 999))
+                : null;
+            const matchesDateTo = !endOfDay || expiryDate <= endOfDay;
+
+            return matchesSearch && matchesStatus && matchesRegion && matchesLOB && matchesDateFrom && matchesDateTo;
         })
     })
 

@@ -68,7 +68,7 @@
       "region": "Australia",
       "underwriter": "Marilie Hoeger",
       "status": "Expired",
-      "flaggedForReview": false
+      "flaggedForReview": true
     },
     {
       "id": "6ed0d9c2-21d6-480f-b6a0-84c2311d22c0",
