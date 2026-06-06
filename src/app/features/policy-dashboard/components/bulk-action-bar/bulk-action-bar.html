@@ -1,1 +1,6 @@
-<p>bulk-action-bar works!</p>
+@if(store.hasSelection()){
+    <div class="bulk-action-bar">
+        <span>{{ store.selectedCount() }} policies selected</span>
+        <button mat-button color="primary" (click)="flagForreview()">Flag for Review</button>
+    </div>
+}

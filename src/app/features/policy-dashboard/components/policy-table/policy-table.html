@@ -1,1 +1,20 @@
-<p>policy-table works!</p>
+<table>
+    <thead>
+        <tr>
+            <th>Policy Number</th>
+            <th>Policy Holder</th>
+            <th>Status</th>
+            <th>Region</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(policy of store.filteredPolicies(); track policy.id){
+            <tr>
+                <td>{{ policy.policyNumber }}</td>
+                <td>{{ policy.policyHolderName }}</td>
+                <td>{{ policy.status }}</td>
+                <td>{{ policy.region }}</td>
+            </tr>
+        }
+    </tbody>
+</table>

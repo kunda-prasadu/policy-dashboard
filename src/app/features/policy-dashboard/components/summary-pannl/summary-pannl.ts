@@ -4,6 +4,7 @@ import { Policy } from '../../models/policy.model';
 
 @Component({
   selector: 'app-summary-pannl',
+  standalone: true,
   imports: [],
   templateUrl: './summary-pannl.html',
   styleUrls: ['./summary-pannl.scss'],

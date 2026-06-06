@@ -30,6 +30,20 @@ export class PolicyStore {
 
     readonly totalPolicies = computed(() => this.policies().length);
 
+    readonly filteredPolicies = computed(() => {
+        const policies = this.policies();
+        const filters = this.filters();
+
+        return policies.filter(policy =>{
+            const matchesSearch = !filters.searchTerm || policy.policyNumber.toLocaleLowerCase().includes(filters.searchTerm.toLocaleLowerCase());
+            const matchesStatus = !filters.status || policy.status === filters.status;
+            const matchesRegion = !filters.region || policy.region === filters.region;
+            const matchesLOB = !filters.lineOfBusiness || policy.lineOfBusiness === filters.lineOfBusiness;
+
+            return matchesSearch && matchesStatus && matchesRegion && matchesLOB;
+        })
+    })
+
     loadingPolicies():void {
         this.loading.set(true);
 
@@ -70,4 +84,19 @@ export class PolicyStore {
         this.selectedPolicyIds.set([]);
     }
 
+    selectAll(policyIds: string[]): void {
+        this.selectedPolicyIds.set(policyIds);
+    }
+  
+    flagSelectedPolicies(): void {
+        const selectedIds = this.selectedPolicyIds();
+        const updatedPolicies = this.policies().map(policy => {
+            if(selectedIds.includes(policy.id)) {
+                return { ...policy, flaggedForReview: true };
+            }
+            return policy;  
+        })
+        this.policies.set(updatedPolicies);
+        this.clearSelection();
+    }
 }
