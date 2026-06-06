@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ErrorState } from './error-state';
 
 describe('ErrorState', () => {
@@ -8,9 +8,9 @@ describe('ErrorState', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ErrorState]
-    })
-    .compileComponents();
+      imports: [ErrorState],
+      providers: [provideZonelessChangeDetection()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ErrorState);
     component = fixture.componentInstance;
