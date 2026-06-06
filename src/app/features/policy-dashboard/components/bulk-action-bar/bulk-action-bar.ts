@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PolicyStore } from '../../store/policy.store';
 
 @Component({
   selector: 'app-bulk-action-bar',
   standalone: true,
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, MatIconModule],
   templateUrl: './bulk-action-bar.html',
   styleUrl: './bulk-action-bar.scss',
 })

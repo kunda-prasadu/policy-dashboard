@@ -5,7 +5,7 @@
   <div class="summary-grid summary-grid--4">
 
     <div class="summary-card summary-card--active">
-      <div class="summary-card__icon">✓</div>
+      <div class="summary-card__icon"><mat-icon>check_circle</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ summary().activeCount }}</span>
         <span class="summary-card__label">Active</span>
@@ -13,7 +13,7 @@
     </div>
 
     <div class="summary-card summary-card--pending">
-      <div class="summary-card__icon">⏳</div>
+      <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ summary().pendingCount }}</span>
         <span class="summary-card__label">Pending</span>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="summary-card summary-card--expired">
-      <div class="summary-card__icon">⚠</div>
+      <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ summary().expiredCount }}</span>
         <span class="summary-card__label">Expired</span>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="summary-card summary-card--cancelled">
-      <div class="summary-card__icon">✕</div>
+      <div class="summary-card__icon"><mat-icon>cancel</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ summary().cancelledCount }}</span>
         <span class="summary-card__label">Cancelled</span>
@@ -43,7 +43,7 @@
   <div class="summary-grid summary-grid--5">
 
     <div class="summary-card summary-card--expiring">
-      <div class="summary-card__icon">🔔</div>
+      <div class="summary-card__icon"><mat-icon>notifications_active</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ summary().expiringWithin30Days }}</span>
         <span class="summary-card__label">Expiring in 30 Days</span>
@@ -51,7 +51,7 @@
     </div>
 
     <div class="summary-card summary-card--property">
-      <div class="summary-card__icon">🏢</div>
+      <div class="summary-card__icon"><mat-icon>home_work</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ formatPremium(summary().propertyPremium) }}</span>
         <span class="summary-card__label">Property GWP</span>
@@ -59,7 +59,7 @@
     </div>
 
     <div class="summary-card summary-card--casualty">
-      <div class="summary-card__icon">🛡️</div>
+      <div class="summary-card__icon"><mat-icon>security</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ formatPremium(summary().casualtyPremium) }}</span>
         <span class="summary-card__label">Casualty GWP</span>
@@ -67,7 +67,7 @@
     </div>
 
     <div class="summary-card summary-card--ah">
-      <div class="summary-card__icon">❤️</div>
+      <div class="summary-card__icon"><mat-icon>favorite</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ formatPremium(summary().ahPremium) }}</span>
         <span class="summary-card__label">A&amp;H GWP</span>
@@ -75,7 +75,7 @@
     </div>
 
     <div class="summary-card summary-card--marine">
-      <div class="summary-card__icon">⚓</div>
+      <div class="summary-card__icon"><mat-icon>anchor</mat-icon></div>
       <div class="summary-card__body">
         <span class="summary-card__count">{{ formatPremium(summary().marinePremium) }}</span>
         <span class="summary-card__label">Marine GWP</span>

@@ -1,28 +1,4 @@
-<!-- <table>
-    <thead>
-        <tr>
-            <th>Select</th>
-            <th>Policy Number</th>
-            <th>Policy Holder</th>
-            <th>Status</th>
-            <th>Region</th>
-        </tr>
-    </thead>
-    <tbody>
-        @for(policy of store.filteredPolicies(); track policy.id){
-            <tr>
-                <td>
-                    <input type="checkbox" [checked]="store.selectedPolicyIds().includes(policy.id)" (change)="store.toggleSelection(policy.id)">
-                </td>
-                <td>{{ policy.policyNumber }}</td>
-                <td>{{ policy.policyHolderName }}</td>
-                <td>{{ policy.status }}</td>
-                <td>{{ policy.region }}</td>
-            </tr>
-        }
-    </tbody>
-</table> -->
-<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+<table mat-table [dataSource]="dataSource" matSort class="policy-table">
     <!-- Select Checkbox -->
     <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
@@ -34,8 +10,8 @@
     </ng-container>
     <!-- Policy Number Column -->
     <ng-container matColumnDef="policyNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Policy Number</th>
-        <td mat-cell *matCellDef="let policy">{{ policy.policyNumber }}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Policy No.</th>
+        <td mat-cell *matCellDef="let policy" class="cell-policy-number">{{ policy.policyNumber }}</td>
     </ng-container>
     <!-- Policy Holder Name Column -->
     <ng-container matColumnDef="policyHolderName">
@@ -46,7 +22,9 @@
     <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
         <td mat-cell *matCellDef="let policy">
-          <span class="status-badge status-badge--{{policy.status.toLowerCase()}}">{{ policy.status }}</span>
+          <span class="status-badge status-badge--{{policy.status.toLowerCase()}}">
+            <span class="status-badge__dot"></span>{{ policy.status }}
+          </span>
         </td>
     </ng-container>
     <!-- Region -->
@@ -57,14 +35,32 @@
     <!-- Premium Column -->
     <ng-container matColumnDef="premium">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Premium</th>
-        <td mat-cell *matCellDef="let policy">{{ policy.premiumAmount }}</td>
+        <td mat-cell *matCellDef="let policy" class="cell-premium">
+          <span class="premium-amount">{{ formatPremium(policy.premiumAmount) }}</span>
+          <span class="premium-currency">{{ policy.currency }}</span>
+        </td>
     </ng-container>
+
+    <!-- Flagged Column -->
+    <ng-container matColumnDef="flagged">
+        <th mat-header-cell *matHeaderCellDef class="col-flagged">
+          <mat-icon class="col-flag-header" matTooltip="Flagged for Review">flag</mat-icon>
+        </th>
+        <td mat-cell *matCellDef="let policy" class="col-flagged">
+          @if(policy.flaggedForReview) {
+            <mat-icon class="flag-icon--on" matTooltip="Flagged for review">flag</mat-icon>
+          }
+        </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
-<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
+<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+
 @if(store.filteredPolicies().length === 0) {
   <div class="empty-state">
-    <p>No policies match the current filters.</p>
+    <mat-icon class="empty-state__icon">search_off</mat-icon>
+    <p class="empty-state__text">No policies match the current filters.</p>
   </div>
 }

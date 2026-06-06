@@ -30,19 +30,29 @@ table {
 .mat-mdc-cell {
   font: var(--mat-sys-body-medium);
   color: var(--mat-sys-on-surface);
-  padding: 12px 16px;
+  padding: 14px 16px;
 }
 
 // Status badge
 .status-badge {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
 
   &--active {
     background: #e6f4ea;
@@ -94,8 +104,75 @@ mat-paginator {
 }
 
 .empty-state {
-  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 24px;
   text-align: center;
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-body-large);
+
+  &__icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.4;
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-large);
+  }
+}
+
+// Policy number — monospace identifier
+.cell-policy-number {
+  font-family: 'Roboto Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+  letter-spacing: 0.2px;
+}
+
+// Premium two-line display
+.cell-premium {
+  .premium-amount {
+    display: block;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--mat-sys-on-surface);
+  }
+
+  .premium-currency {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+}
+
+// Flag column
+.col-flagged {
+  width: 48px;
+  text-align: center;
+  padding: 0 8px !important;
+
+  .col-flag-header {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--mat-sys-on-surface-variant);
+    opacity: 0.45;
+    vertical-align: middle;
+  }
+}
+
+.flag-icon--on {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #d32f2f;
+  cursor: default;
 }

@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { PolicyStore } from '../../store/policy.store';
 
 @Component({
   selector: 'app-summary-pannl',
   standalone: true,
-  imports: [],
+  imports: [MatIconModule],
   templateUrl: './summary-pannl.html',
   styleUrls: ['./summary-pannl.scss'],
 })

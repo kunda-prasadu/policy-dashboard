@@ -5,18 +5,20 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-policy-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatCheckboxModule, MatSortModule, MatPaginatorModule],
+  imports: [CommonModule, MatTableModule, MatCheckboxModule, MatSortModule, MatPaginatorModule, MatIconModule, MatTooltipModule],
   templateUrl: './policy-table.html',
   styleUrls: ['./policy-table.scss'],
 })
 export class PolicyTable {
   readonly store = inject(PolicyStore);
 
-  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'status', 'region', 'premium'];
+  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'status', 'region', 'premium', 'flagged'];
   dataSource = new MatTableDataSource<any>();
 
   sort = viewChild(MatSort);
@@ -52,5 +54,11 @@ export class PolicyTable {
     } else {
       this.store.selectAll(pageIds);
     }
+  }
+
+  formatPremium(value: number): string {
+    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;
+    return `$${value}`;
   }
 }
