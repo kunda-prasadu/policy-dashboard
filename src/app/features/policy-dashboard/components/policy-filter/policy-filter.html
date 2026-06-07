@@ -7,8 +7,9 @@
   </mat-form-field>
 
   <button mat-stroked-button class="filter-bar__btn" (click)="openFilters()"
-    [class.filter-bar__btn--active]="activeFilterCount() > 0">
-    <mat-icon>tune</mat-icon>
+    [class.filter-bar__btn--active]="activeFilterCount() > 0"
+    [attr.aria-label]="activeFilterCount() > 0 ? 'All Filters, ' + activeFilterCount() + ' active' : 'All Filters'">
+    <mat-icon aria-hidden="true">tune</mat-icon>
     All Filters
     @if (activeFilterCount() > 0) {
       <span class="filter-bar__badge">{{ activeFilterCount() }}</span>

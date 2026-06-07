@@ -1,6 +1,6 @@
-<header class="app-toolbar">
+<header class="app-toolbar" role="banner">
   <div class="app-toolbar__brand">
-    <mat-icon class="app-toolbar__logo">shield</mat-icon>
+    <mat-icon class="app-toolbar__logo" aria-hidden="true">shield</mat-icon>
     <div>
       <span class="app-toolbar__name">Policy Hub</span>
       <span class="app-toolbar__org">Chubb APAC</span>
@@ -12,8 +12,10 @@
       [matTooltip]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
       (click)="themeService.toggle()"
       aria-label="Toggle dark mode">
-      <mat-icon>{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      <mat-icon aria-hidden="true">{{ themeService.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
   </div>
 </header>
-<router-outlet />
+<main>
+  <router-outlet />
+</main>

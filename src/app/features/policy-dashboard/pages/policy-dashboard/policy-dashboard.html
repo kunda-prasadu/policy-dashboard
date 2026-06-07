@@ -14,6 +14,7 @@
       (retryClick)="retry()"
     />
   } @else {
+    <!-- Summary + filters paint first (above the fold, critical for LCP) -->
     <section class="dashboard-summary">
       <app-summary-pannl />
     </section>
@@ -22,10 +23,15 @@
       <app-policy-filter />
     </section>
 
-    <app-bulk-action-bar />
+    <!-- Bulk action bar and table are deferred until browser is idle after initial paint -->
+    @defer (on idle) {
+      <app-bulk-action-bar />
 
-    <section class="dashboard-table">
-      <app-policy-table />
-    </section>
+      <section class="dashboard-table">
+        <app-policy-table />
+      </section>
+    } @placeholder {
+      <div class="table-placeholder" aria-busy="true" aria-label="Loading policy table…"></div>
+    }
   }
 </div>
