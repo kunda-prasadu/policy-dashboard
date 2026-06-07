@@ -140,15 +140,60 @@ A running log of AI collaboration decisions made during this assessment — what
 
 ---
 
+### 10. Server-Side Filtering
+
+**Prompt intent:** The spec says "server-side filtering by status, line of business, date range, and region". Initial implementation loaded all 250 records and filtered in the signal store.
+
+**Challenged:**
+- Identified the gap during requirements re-verification. `getPolicies()` had no query params.
+
+**Overrode:**
+- Added `HttpParams` to `PolicyApiService.getPolicies(filters?)`. Enum filters (`status`, `region`, `lineOfBusiness`) and `minPremium` are now sent as query params — confirmed working against JSON Server v1 beta.
+- Free-text search and date range remain client-side: JSON Server v1 `?q=` is broken (returns 0 results) and ISO-date range comparison is unreliable. Documented in code comment.
+- Chose a **hybrid** approach: reduce payload server-side where reliable, finish precisely client-side. Prepared to defend this trade-off in the walkthrough.
+
+---
+
+### 11. Internationalisation Readiness
+
+**Prompt intent:** Requirement lists i18n readiness as a cross-cutting concern. Dashboard has multi-currency data (USD, SGD, HKD, AUD, JPY, THB).
+
+**Challenged:**
+- AI's initial `formatPremium` hardcoded `$` as currency symbol — wrong for JPY, SGD, THB policies.
+- `toLocaleDateString('en-GB', ...)` was hardcoded — defeats the purpose of a `LOCALE_ID` token.
+
+**Overrode:**
+- Added `{ provide: LOCALE_ID, useValue: 'en-GB' }` in `AppConfig` and `registerLocaleData(localeEnGb)` in `main.ts`.
+- Replaced all `formatPremium` methods with `getCurrencySymbol(currencyCode, 'narrow', locale)` — each policy now displays its own currency symbol.
+- `formatDate` reads `inject(LOCALE_ID)` instead of the hardcoded string.
+- GWP totals (aggregated cross-currency) use USD with a code comment explaining the FX gap.
+
+---
+
+### 12. Requirements Re-verification
+
+**Prompt intent:** Systematic gap analysis after feature completion.
+
+**Challenged / found and fixed:**
+- `Indonasia` typo in `generate-data.js` and all 250 db.json records — filtering by Indonesia returned 0 results.
+- `LineOfBussiness` type name (double `s`) across 4 files — renamed to `LineOfBusiness`.
+- `lineOfBusiness` missing from main table columns — added as sortable column.
+- `summary-pannl` folder/selector/class typo — renamed to `summary-panel`.
+- `environment.prod.ts` missing — created with `fileReplacements` in `angular.json`.
+- `FilterPanel` had no spec — added 10-test spec covering form seeding, premiumLabel, apply/reset/close.
+- `X-Frame-Options` set via `<meta>` tag (browsers ignore it) — moved to `angular.json` `serve.headers`.
+
+---
+
 ## What I Would Do With More Time
 
 1. **E2E tests** (Playwright) for critical flows: load → filter → flag → renew
 2. **Virtual scrolling** (`CdkVirtualScrollViewport`) for the table — with 250+ records the current approach re-renders all filtered rows on every filter change
 3. **Batch PATCH endpoint** in the mock API — current flag implementation fires N parallel PATCHes
-4. **i18n** — `$localize` tags and a locale file for at least EN + ZH (Chubb APAC coverage)
+4. **Full i18n** — `$localize` tags and locale files for EN + ZH (Chubb APAC coverage); current work establishes the token infrastructure
 5. **MFE exploration** — Module Federation to split the filter panel and table into independently deployable units
 6. **Real auth guard** — the dashboard currently has no route guard; add a mock JWT check
-7. **Performance budget** — `summary-pannl.scss` already exceeds the Angular default budget; audit and split
+7. **Live FX rates for GWP** — aggregating multi-currency premiums in USD is architecturally noted as a limitation
 
 ---
 
@@ -166,3 +211,6 @@ Where I added the most value:
 - Deciding against `forkJoin` for bulk PATCH
 - Removing SSR (AI scaffolded it by default)
 - Pushing for a proper `StorageService` abstraction rather than scattered `localStorage` calls
+- Catching the `Indonasia` / `LineOfBussiness` / `summary-pannl` typos during requirements re-verification
+- Deciding on hybrid server/client filtering rather than accepting the all-client-side approach
+- Pushing for genuine `getCurrencySymbol` i18n rather than accepting hardcoded `$`
