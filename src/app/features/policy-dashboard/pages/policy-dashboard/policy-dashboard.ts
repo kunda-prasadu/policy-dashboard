@@ -4,8 +4,8 @@ import { PolicyFilter } from '../../components/policy-filter/policy-filter';
 import { SummaryPannl } from '../../components/summary-pannl/summary-pannl';
 import { PolicyTable } from '../../components/policy-table/policy-table';
 import { BulkActionBar } from '../../components/bulk-action-bar/bulk-action-bar';
-import { LoadingSkeleton } from '../../components/loading-skeleton/loading-skeleton';
-import { ErrorState } from '../../components/error-state/error-state';
+import { LoadingSkeleton } from '../../../../shared/loading-skeleton/loading-skeleton';
+import { ErrorState } from '../../../../shared/error-state/error-state';
 
 @Component({
   selector: 'app-policy-dashboard',

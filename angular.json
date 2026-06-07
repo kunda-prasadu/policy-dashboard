@@ -57,6 +57,13 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "headers": {
+              "X-Frame-Options": "SAMEORIGIN",
+              "X-Content-Type-Options": "nosniff",
+              "Referrer-Policy": "strict-origin-when-cross-origin"
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "policy-dashboard:build:production"

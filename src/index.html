@@ -7,9 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Chubb APAC Policy Overview Dashboard — manage and monitor insurance policies across regions.">
 
-  <!-- Security headers via meta tags (server-level headers preferred in production) -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+  <!-- Security meta tags -->
+  <!-- Note: X-Frame-Options and X-Content-Type-Options must be set as HTTP response
+       headers at the server/CDN level — meta tags are ignored by browsers for these.
+       They are configured in angular.json (dev server) and must be added to your
+       production server config (nginx/Apache/Vercel/Netlify _headers). -->
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 
   <link rel="icon" type="image/x-icon" href="favicon.ico">
