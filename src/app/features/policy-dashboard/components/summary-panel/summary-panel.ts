@@ -6,13 +6,13 @@ import { PolicyStatus } from '../../models/policy.model';
 import { PolicyDrilldownDialog, DrilldownMode } from '../policy-drilldown-dialog/policy-drilldown-dialog';
 
 @Component({
-  selector: 'app-summary-pannl',
+  selector: 'app-summary-panel',
   standalone: true,
   imports: [MatIconModule, MatDialogModule],
-  templateUrl: './summary-pannl.html',
-  styleUrls: ['./summary-pannl.scss'],
+  templateUrl: './summary-panel.html',
+  styleUrls: ['./summary-panel.scss'],
 })
-export class SummaryPannl {
+export class SummaryPanel {
   readonly store  = inject(PolicyStore);
   private readonly dialog = inject(MatDialog);
   readonly summary = this.store.summary;

@@ -19,6 +19,11 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Policy Holder</th>
         <td mat-cell *matCellDef="let policy">{{ policy.policyHolderName }}</td>
     </ng-container>
+    <!-- Line of Business Column -->
+    <ng-container matColumnDef="lineOfBusiness">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Line of Business</th>
+        <td mat-cell *matCellDef="let policy">{{ policy.lineOfBusiness }}</td>
+    </ng-container>
     <!-- Status Column -->
     <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>

@@ -1,8 +1,8 @@
-import { LineOfBussiness,PolicyStatus, Region } from './policy.model';
+import { LineOfBusiness, PolicyStatus, Region } from './policy.model';
 
 export interface PolicyFilter {
   searchTerm: string;
-  lineOfBusiness?: LineOfBussiness | '';
+  lineOfBusiness?: LineOfBusiness | '';
   status?: PolicyStatus | '';
   region?: Region | '';
   startDate?: Date;

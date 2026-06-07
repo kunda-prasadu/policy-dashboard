@@ -1,6 +1,6 @@
 export type PolicyStatus = 'Active' | 'Expired' | 'Pending' | 'Cancelled';
 
-export type LineOfBussiness = 'Property' | 'Casualty' | 'A&H' | 'Marine';
+export type LineOfBusiness = 'Property' | 'Casualty' | 'A&H' | 'Marine';
 
 export type Currency = 'USD' | 'SGD' | 'HKD' | 'AUD' | 'JPY' | 'THB';
 
@@ -10,7 +10,7 @@ export interface Policy {
   id: string;
   policyNumber: string;
   policyHolderName: string;
-  lineOfBusiness: LineOfBussiness;
+  lineOfBusiness: LineOfBusiness;
   status: PolicyStatus;
   premiumAmount: number;
   currency: Currency;

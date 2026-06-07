@@ -2,7 +2,7 @@ const { faker } = require('@faker-js/faker');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-const regions = [ 'Singapore', 'Hong Kong', 'Australia', 'Japan', 'Thailand','Indonasia', 'Malaysia', 'Philippines'];
+const regions = [ 'Singapore', 'Hong Kong', 'Australia', 'Japan', 'Thailand','Indonesia', 'Malaysia', 'Philippines'];
 
 const linesOfBusiness = [ 'Property', 'Casualty', 'Marine', 'A&H' ];
 

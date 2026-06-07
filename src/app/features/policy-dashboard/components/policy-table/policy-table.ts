@@ -23,7 +23,7 @@ export class PolicyTable {
   private static readonly PAGE_SIZE_KEY = 'policy-page-size';
   private static readonly DEFAULT_PAGE_SIZE = 10;
 
-  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'status', 'region', 'premium', 'flagged'];
+  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged'];
   dataSource = new MatTableDataSource<any>();
   readonly initialPageSize = this.storage.get<number>(PolicyTable.PAGE_SIZE_KEY) ?? PolicyTable.DEFAULT_PAGE_SIZE;
 

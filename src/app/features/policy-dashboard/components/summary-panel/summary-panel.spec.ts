@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal, computed } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatDialog } from '@angular/material/dialog';
-import { SummaryPannl } from './summary-pannl';
+import { SummaryPanel } from './summary-panel';
 import { PolicyStore } from '../../store/policy.store';
 function makeSummary(overrides = {}) {
   return {
@@ -20,9 +20,9 @@ function makeSummary(overrides = {}) {
   };
 }
 
-describe('SummaryPannl', () => {
-  let component: SummaryPannl;
-  let fixture: ComponentFixture<SummaryPannl>;
+describe('SummaryPanel', () => {
+  let component: SummaryPanel;
+  let fixture: ComponentFixture<SummaryPanel>;
 
   const summarySignal = signal(makeSummary());
 
@@ -33,7 +33,7 @@ describe('SummaryPannl', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SummaryPannl],
+      imports: [SummaryPanel],
       providers: [
         provideZonelessChangeDetection(),
         provideAnimationsAsync(),
@@ -41,7 +41,7 @@ describe('SummaryPannl', () => {
       ],
     }).compileComponents();
 
-    fixture   = TestBed.createComponent(SummaryPannl);
+    fixture   = TestBed.createComponent(SummaryPanel);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

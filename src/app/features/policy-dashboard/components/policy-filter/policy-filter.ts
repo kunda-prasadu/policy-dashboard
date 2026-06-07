@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { PolicyStore } from '../../store/policy.store';
-import { PolicyStatus, Region, LineOfBussiness } from '../../models/policy.model';
+import { PolicyStatus, Region, LineOfBusiness } from '../../models/policy.model';
 import { FilterPanel } from '../filter-panel/filter-panel';
 import { StorageService } from '../../../../core/services/storage.service';
 
@@ -95,7 +95,7 @@ export class PolicyFilter implements OnDestroy {
         searchTerm:     f.searchTerm      ?? '',
         status:         (f.status         ?? '') as PolicyStatus | '',
         region:         (f.region         ?? '') as Region | '',
-        lineOfBusiness: (f.lineOfBusiness  ?? '') as LineOfBussiness | '',
+        lineOfBusiness: (f.lineOfBusiness  ?? '') as LineOfBusiness | '',
         startDate:      f.startDate  ?? undefined,
         endDate:        f.endDate    ?? undefined,
         minPremium:     f.minPremium ?? 0,
