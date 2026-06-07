@@ -153,6 +153,8 @@ export class PolicyFilter implements OnDestroy {
           status: '', region: '', lineOfBusiness: '',
           startDate: null, endDate: null, minPremium: 0,
         });
+        // Re-fetch from server with cleared server-side filters
+        this.store.loadingPolicies();
         return;
       }
 
@@ -164,6 +166,8 @@ export class PolicyFilter implements OnDestroy {
         endDate:        result.endDate        ?? null,
         minPremium:     result.minPremium      ?? 0,
       });
+      // Re-fetch from server with updated server-side filters
+      this.store.loadingPolicies();
     });
   }
 

@@ -82,7 +82,7 @@ export class PolicyStore {
         this.loading.set(true);
         this.logger.info('Loading policies from API');
 
-        this.policyApiService.getPolicies().subscribe({
+        this.policyApiService.getPolicies(this.filters()).subscribe({
             next: (policies) => {
                 this.policies.set(policies);
                 this.loading.set(false);

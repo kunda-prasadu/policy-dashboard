@@ -42,8 +42,7 @@
     <ng-container matColumnDef="premium">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Premium</th>
         <td mat-cell *matCellDef="let policy" class="cell-premium">
-          <span class="premium-amount">{{ formatPremium(policy.premiumAmount) }}</span>
-          <span class="premium-currency">{{ policy.currency }}</span>
+          <span class="premium-amount">{{ formatPremium(policy.premiumAmount, policy.currency) }}</span>
         </td>
     </ng-container>
 

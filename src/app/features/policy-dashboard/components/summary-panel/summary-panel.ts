@@ -1,4 +1,5 @@
-import { Component, inject, computed } from '@angular/core';
+import { getCurrencySymbol } from '@angular/common';
+import { Component, inject, computed, LOCALE_ID } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PolicyStore } from '../../store/policy.store';
@@ -14,7 +15,8 @@ import { PolicyDrilldownDialog, DrilldownMode } from '../policy-drilldown-dialog
 })
 export class SummaryPanel {
   readonly store  = inject(PolicyStore);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog  = inject(MatDialog);
+  private readonly locale  = inject(LOCALE_ID);
   readonly summary = this.store.summary;
 
   openDrilldown(mode: DrilldownMode, status?: PolicyStatus): void {
@@ -44,10 +46,14 @@ export class SummaryPanel {
   }
 
   readonly arcCircumference = 2 * Math.PI * 18;
+  // GWP totals aggregate premiums across multiple currencies — displayed using
+  // USD as the base reporting currency. In production, apply live FX rates to
+  // convert each policy's premium before summing.
   formatPremium(value: number): string {
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;
-    return `$${value}`;
+    const sym = getCurrencySymbol('USD', 'narrow', this.locale as string);
+    if (value >= 1_000_000) return `${sym}${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000)     return `${sym}${(value / 1_000).toFixed(0)}K`;
+    return `${sym}${value}`;
   }
 
   /** Returns width % of a LOB value vs total GWP (min 2% so bar is always visible) */

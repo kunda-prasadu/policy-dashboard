@@ -1,5 +1,5 @@
-import { Component, inject, computed, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { Component, inject, computed, signal, LOCALE_ID } from '@angular/core';
+import { NgClass, getCurrencySymbol } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +27,7 @@ export class PolicyDrilldownDialog {
   private readonly dialogRef = inject(MatDialogRef<PolicyDrilldownDialog>);
   readonly data: DrilldownDialogData = inject(MAT_DIALOG_DATA);
   private readonly store = inject(PolicyStore);
+  private readonly locale = inject(LOCALE_ID);
 
   readonly displayedColumns = computed(() =>
     this.data.mode === 'expiring'
@@ -94,14 +95,15 @@ export class PolicyDrilldownDialog {
     return '';
   }
 
-  formatPremium(value: number): string {
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;
-    return `$${value}`;
+  formatPremium(value: number, currencyCode: string): string {
+    const sym = getCurrencySymbol(currencyCode, 'narrow', this.locale as string);
+    if (value >= 1_000_000) return `${sym}${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000)     return `${sym}${(value / 1_000).toFixed(0)}K`;
+    return `${sym}${value}`;
   }
 
   formatDate(d: Date | string): string {
-    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    return new Date(d).toLocaleDateString(this.locale, { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   trackById(_index: number, policy: { id: string }): string {

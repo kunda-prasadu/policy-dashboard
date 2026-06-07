@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, LOCALE_ID } from '@angular/core';
+import { getCurrencySymbol } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +35,7 @@ import { POLICY_STATUSES, REGIONS, LINE_OF_BUSINESS } from '../../constants/poli
 export class FilterPanel {
   private readonly sheetRef = inject(MatBottomSheetRef<FilterPanel>);
   private readonly fb       = inject(FormBuilder);
+  private readonly locale   = inject(LOCALE_ID);
   readonly data             = inject(MAT_BOTTOM_SHEET_DATA);
 
   readonly statuses = POLICY_STATUSES;
@@ -51,9 +53,10 @@ export class FilterPanel {
 
   get premiumLabel(): string {
     const v = this.form.get('minPremium')?.value ?? 0;
-    if (v >= 1_000_000) return '$1M+';
-    if (v >= 1_000)     return `$${Math.round(v / 1_000)}K`;
-    return `$${v}`;
+    const sym = getCurrencySymbol('USD', 'narrow', this.locale as string);
+    if (v >= 1_000_000) return `${sym}1M+`;
+    if (v >= 1_000)     return `${sym}${Math.round(v / 1_000)}K`;
+    return `${sym}${v}`;
   }
 
   apply(): void {

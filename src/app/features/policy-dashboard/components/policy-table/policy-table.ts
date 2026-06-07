@@ -1,6 +1,6 @@
-import { Component, effect, inject, viewChild } from '@angular/core';
+import { Component, effect, inject, LOCALE_ID, viewChild } from '@angular/core';
 import { PolicyStore } from '../../store/policy.store';
-import { CommonModule } from '@angular/common';
+import { CommonModule, getCurrencySymbol } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -19,6 +19,7 @@ import { StorageService } from '../../../../core/services/storage.service';
 export class PolicyTable {
   readonly store = inject(PolicyStore);
   private readonly storage = inject(StorageService);
+  private readonly locale  = inject(LOCALE_ID);
 
   private static readonly PAGE_SIZE_KEY = 'policy-page-size';
   private static readonly DEFAULT_PAGE_SIZE = 10;
@@ -67,9 +68,10 @@ export class PolicyTable {
     }
   }
 
-  formatPremium(value: number): string {
-    if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-    if (value >= 1_000)     return `$${(value / 1_000).toFixed(0)}K`;
-    return `$${value}`;
+  formatPremium(value: number, currencyCode: string): string {
+    const sym = getCurrencySymbol(currencyCode, 'narrow', this.locale as string);
+    if (value >= 1_000_000) return `${sym}${(value / 1_000_000).toFixed(1)}M`;
+    if (value >= 1_000)     return `${sym}${(value / 1_000).toFixed(0)}K`;
+    return `${sym}${value}`;
   }
 }

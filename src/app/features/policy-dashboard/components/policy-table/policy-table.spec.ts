@@ -48,18 +48,18 @@ describe('PolicyTable', () => {
 
   describe('formatPremium', () => {
     it('formats values >= 1_000_000 as $xM', () => {
-      expect(component.formatPremium(1_500_000)).toBe('$1.5M');
-      expect(component.formatPremium(2_000_000)).toBe('$2.0M');
+      expect(component.formatPremium(1_500_000, 'USD')).toBe('$1.5M');
+      expect(component.formatPremium(2_000_000, 'USD')).toBe('$2.0M');
     });
 
     it('formats values >= 1_000 as $xK', () => {
-      expect(component.formatPremium(250_000)).toBe('$250K');
-      expect(component.formatPremium(1_000)).toBe('$1K');
+      expect(component.formatPremium(250_000, 'USD')).toBe('$250K');
+      expect(component.formatPremium(1_000, 'USD')).toBe('$1K');
     });
 
     it('formats values < 1_000 as plain $x', () => {
-      expect(component.formatPremium(999)).toBe('$999');
-      expect(component.formatPremium(0)).toBe('$0');
+      expect(component.formatPremium(999, 'USD')).toBe('$999');
+      expect(component.formatPremium(0, 'USD')).toBe('$0');
     });
   });
 
