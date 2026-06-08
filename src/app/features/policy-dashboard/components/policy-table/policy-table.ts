@@ -37,6 +37,9 @@ export class PolicyTable {
 
     effect(() => {
       this.dataSource.data = this.store.filteredPolicies();
+      // Reset to page 1 whenever the filtered dataset changes so users never
+      // land on a non-existent page after applying or clearing a filter.
+      this.paginator()?.firstPage();
     });
   }
 

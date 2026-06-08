@@ -1,3 +1,4 @@
+<div class="table-responsive-wrapper">
 <table mat-table [dataSource]="dataSource" matSort class="policy-table"
        aria-label="Policy data table">
     <!-- Select Checkbox -->
@@ -61,7 +62,8 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
-<mat-paginator [pageSize]="initialPageSize" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+</div>
+<mat-paginator [pageSize]="initialPageSize" [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
 
 @if(store.filteredPolicies().length === 0) {
   <div class="empty-state" role="status" aria-live="polite">

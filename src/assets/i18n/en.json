@@ -1,0 +1,111 @@
+{
+  "APP": {
+    "TITLE": "Policy Hub — Chubb APAC"
+  },
+  "FILTER": {
+    "SEARCH_PLACEHOLDER": "Policy No. / Holder / Underwriter",
+    "SEARCH_LABEL": "Search policies",
+    "ALL_FILTERS": "All Filters",
+    "ALL_FILTERS_ACTIVE": "All Filters, {{count}} active",
+    "ADVANCED_TITLE": "Advanced Filters",
+    "APPLY": "Apply Filters",
+    "RESET": "Reset",
+    "CLOSE": "Close filters",
+    "STATUS_LABEL": "Status",
+    "STATUS_PLACEHOLDER": "All Statuses",
+    "REGION_LABEL": "Region",
+    "REGION_PLACEHOLDER": "All Regions",
+    "LOB_LABEL": "Line of Business",
+    "LOB_PLACEHOLDER": "All Lines",
+    "DATE_FROM_LABEL": "Effective Date From",
+    "DATE_TO_LABEL": "Effective Date To",
+    "MIN_PREMIUM_LABEL": "Minimum Premium ({{currency}})"
+  },
+  "TABLE": {
+    "CAPTION": "Policy list",
+    "COLUMN_SELECT": "Select",
+    "COLUMN_POLICY_NUMBER": "Policy No.",
+    "COLUMN_POLICY_HOLDER": "Policy Holder",
+    "COLUMN_LOB": "Line of Business",
+    "COLUMN_STATUS": "Status",
+    "COLUMN_REGION": "Region",
+    "COLUMN_PREMIUM": "Premium",
+    "COLUMN_FLAGGED": "Flagged for Review",
+    "SELECT_ALL": "Select all policies on this page",
+    "SELECT_ROW": "Select policy {{policyNumber}}",
+    "EMPTY_STATE": "No policies match the current filters.",
+    "PAGE_SIZE_OPTIONS": "Items per page"
+  },
+  "STATUS": {
+    "ACTIVE": "Active",
+    "EXPIRED": "Expired",
+    "PENDING": "Pending",
+    "CANCELLED": "Cancelled"
+  },
+  "LOB": {
+    "PROPERTY": "Property",
+    "CASUALTY": "Casualty",
+    "AH": "A&H",
+    "MARINE": "Marine"
+  },
+  "REGION": {
+    "SINGAPORE": "Singapore",
+    "HONG_KONG": "Hong Kong",
+    "AUSTRALIA": "Australia",
+    "JAPAN": "Japan",
+    "THAILAND": "Thailand",
+    "INDONESIA": "Indonesia",
+    "MALAYSIA": "Malaysia",
+    "PHILIPPINES": "Philippines"
+  },
+  "SUMMARY": {
+    "TITLE": "Portfolio Summary",
+    "ACTIVE": "Active",
+    "EXPIRED": "Expired",
+    "PENDING": "Pending",
+    "CANCELLED": "Cancelled",
+    "EXPIRING_SOON": "Expiring within 30 days",
+    "GWP_TITLE": "Gross Written Premium",
+    "GWP_BY_LOB": "GWP by Line of Business",
+    "TOTAL_GWP": "Total GWP"
+  },
+  "BULK_ACTION": {
+    "SELECTED_SINGULAR": "policy selected",
+    "SELECTED_PLURAL": "policies selected",
+    "CLEAR_SELECTION": "Clear Selection",
+    "FLAG_FOR_REVIEW": "Flag for Review",
+    "FLAG_SUCCESS_SINGULAR": "1 policy flagged for review",
+    "FLAG_SUCCESS_PLURAL": "{{count}} policies flagged for review"
+  },
+  "DRILLDOWN": {
+    "TITLE": "Policy Details",
+    "CLOSE": "Close policy details",
+    "POLICY_NUMBER": "Policy Number",
+    "POLICY_HOLDER": "Policyholder",
+    "LINE_OF_BUSINESS": "Line of Business",
+    "STATUS": "Status",
+    "REGION": "Region",
+    "UNDERWRITER": "Underwriter",
+    "EFFECTIVE_DATE": "Effective Date",
+    "EXPIRY_DATE": "Expiry Date",
+    "PREMIUM": "Premium",
+    "FLAGGED": "Flagged for Review",
+    "RENEW": "Renew",
+    "RENEWING": "Renewing…",
+    "RENEW_ARIA": "Renew policy {{policyNumber}}"
+  },
+  "ERROR": {
+    "GENERIC_TITLE": "Something went wrong",
+    "GENERIC_MESSAGE": "We couldn't load your policies. Please try again.",
+    "RETRY": "Retry",
+    "NETWORK": "Network error — please check your connection.",
+    "HTTP": "Server error ({{status}}): {{message}}"
+  },
+  "LOADING": {
+    "ARIA_LABEL": "Loading policies…"
+  },
+  "THEME": {
+    "TOGGLE_LIGHT": "Switch to light theme",
+    "TOGGLE_DARK": "Switch to dark theme"
+  }
+}

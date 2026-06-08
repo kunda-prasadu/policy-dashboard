@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, computed } from '@angular/core';
+import { Component, inject, OnDestroy, computed, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
@@ -35,6 +35,9 @@ export class PolicyFilter implements OnDestroy {
   private readonly destroy$    = new Subject<void>();
 
   private static readonly STORAGE_KEY = 'policy-filters';
+
+  /** Tracks whether the advanced-filters bottom sheet is currently open (for aria-expanded). */
+  readonly isFilterSheetOpen = signal(false);
 
   readonly filterForm = this.fb.group({
     searchTerm:     [''],
@@ -132,6 +135,7 @@ export class PolicyFilter implements OnDestroy {
 
   openFilters(): void {
     const current = this.filterForm.value;
+    this.isFilterSheetOpen.set(true);
     const ref = this.bottomSheet.open(FilterPanel, {
       data: {
         startDate:      current.startDate,
@@ -145,6 +149,7 @@ export class PolicyFilter implements OnDestroy {
     });
 
     ref.afterDismissed().subscribe(result => {
+      this.isFilterSheetOpen.set(false);
       if (!result) return; // dismissed without action (X or backdrop)
 
       if (result === 'reset') {

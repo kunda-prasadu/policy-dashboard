@@ -31,4 +31,13 @@ export class StorageService {
       // ignore
     }
   }
+
+  /** Remove all app-managed keys from localStorage. */
+  clearAll(): void {
+    try {
+      localStorage.clear();
+    } catch {
+      // ignore
+    }
+  }
 }

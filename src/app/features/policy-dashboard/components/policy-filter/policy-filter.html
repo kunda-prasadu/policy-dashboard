@@ -8,7 +8,9 @@
 
   <button mat-stroked-button class="filter-bar__btn" (click)="openFilters()"
     [class.filter-bar__btn--active]="activeFilterCount() > 0"
-    [attr.aria-label]="activeFilterCount() > 0 ? 'All Filters, ' + activeFilterCount() + ' active' : 'All Filters'">
+    [attr.aria-label]="activeFilterCount() > 0 ? 'All Filters, ' + activeFilterCount() + ' active' : 'All Filters'"
+    [attr.aria-expanded]="isFilterSheetOpen()"
+    aria-haspopup="dialog">
     <mat-icon aria-hidden="true">tune</mat-icon>
     All Filters
     @if (activeFilterCount() > 0) {

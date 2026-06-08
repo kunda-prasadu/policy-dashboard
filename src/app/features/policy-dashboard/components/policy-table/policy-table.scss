@@ -2,8 +2,16 @@
   display: block;
 }
 
+// Responsive wrapper — horizontal scroll on narrow viewports (tablet/mobile)
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 table {
   width: 100%;
+  min-width: 700px; // prevent columns collapsing on mobile
 }
 
 // Force row heights — MDC ignores CSS custom properties scoped to :host

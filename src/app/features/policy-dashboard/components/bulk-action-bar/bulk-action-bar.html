@@ -1,6 +1,6 @@
 @if(store.hasSelection()){
   <div class="bulk-action-bar" role="toolbar" aria-label="Bulk actions">
-    <div class="bulk-action-bar__info">
+    <div class="bulk-action-bar__info" aria-live="polite" aria-atomic="true">
       <span class="bulk-action-bar__count">{{ store.selectedCount() }}</span>
       <span class="bulk-action-bar__label">{{ store.selectedCount() === 1 ? 'policy' : 'policies' }} selected</span>
     </div>
