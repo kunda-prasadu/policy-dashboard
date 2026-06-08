@@ -1,0 +1,359 @@
+// ─── Custom Colour Palettes ───────────────────────────────────────────────────
+// Selector specificity: html[data-palette] (0,1,1) > html (0,0,1)
+// → palette rules win over mat.theme() and the html{} defaults in styles.scss.
+//
+// Each palette overrides:
+//   • Primary color tokens  → buttons, chips, FABs, focus rings
+//   • Surface/container tokens → toolbar, cards, bottom sheet, dialogs
+//   • --app-bg              → page body background (picked up via var in styles.scss)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Chubb Navy (default — blue-grey slate) ───────────────────────────────────
+html[data-palette='chubb-navy'] {
+  --mat-sys-primary:              #1b3a6b;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #dce8ff;
+  --mat-sys-on-primary-container: #001945;
+  --app-swatch:                   #1b3a6b;
+  --app-bg:                               #f1f5f9;
+  --mat-sys-surface:                      #ffffff;
+  --mat-sys-surface-container-lowest:     #f8fafc;
+  --mat-sys-surface-container-low:        #f1f5f9;
+  --mat-sys-surface-container:            #e2e8f0;
+  --mat-sys-surface-container-high:       #cbd5e1;
+  --mat-sys-surface-container-highest:    #b8c4d4;
+  --mat-sys-outline-variant:              #e2e8f0;
+  --mat-sys-outline:                      #94a3b8;
+}
+
+html.dark-theme[data-palette='chubb-navy'] {
+  --mat-sys-primary:              #93b4ff;
+  --mat-sys-on-primary:           #002984;
+  --mat-sys-primary-container:    #0a2a5e;
+  --mat-sys-on-primary-container: #dce8ff;
+  --app-swatch:                   #93b4ff;
+  --app-bg:                               #0a1628;
+  --mat-sys-surface:                      #0f2044;
+  --mat-sys-surface-container-lowest:     #0a1628;
+  --mat-sys-surface-container-low:        #0f2044;
+  --mat-sys-surface-container:            #162850;
+  --mat-sys-surface-container-high:       #1e3460;
+  --mat-sys-surface-container-highest:    #254070;
+  --mat-sys-outline-variant:              #2a4060;
+  --mat-sys-outline:                      #4a6080;
+}
+
+// ── Ocean Teal ───────────────────────────────────────────────────────────────
+html[data-palette='ocean-teal'] {
+  --mat-sys-primary:              #0d7377;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #b3eef0;
+  --mat-sys-on-primary-container: #003a3c;
+  --app-swatch:                   #0d7377;
+  --app-bg:                               #d8f2f3;
+  --mat-sys-surface:                      #f5feff;
+  --mat-sys-surface-container-lowest:     #ecfafa;
+  --mat-sys-surface-container-low:        #d8f2f3;
+  --mat-sys-surface-container:            #b8e8e9;
+  --mat-sys-surface-container-high:       #9adde0;
+  --mat-sys-surface-container-highest:    #82d4d7;
+  --mat-sys-outline-variant:              #b8e8e9;
+  --mat-sys-outline:                      #5fb8bb;
+}
+
+html.dark-theme[data-palette='ocean-teal'] {
+  --mat-sys-primary:              #4de0e4;
+  --mat-sys-on-primary:           #003a3c;
+  --mat-sys-primary-container:    #005457;
+  --mat-sys-on-primary-container: #b3eef0;
+  --app-swatch:                   #4de0e4;
+  --app-bg:                               #071515;
+  --mat-sys-surface:                      #0d2020;
+  --mat-sys-surface-container-lowest:     #071515;
+  --mat-sys-surface-container-low:        #0d2020;
+  --mat-sys-surface-container:            #122b2b;
+  --mat-sys-surface-container-high:       #1a3838;
+  --mat-sys-surface-container-highest:    #224545;
+  --mat-sys-outline-variant:              #224545;
+  --mat-sys-outline:                      #3a6060;
+}
+
+// ── Forest Green ─────────────────────────────────────────────────────────────
+html[data-palette='forest-green'] {
+  --mat-sys-primary:              #166534;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #bbf7d0;
+  --mat-sys-on-primary-container: #052e16;
+  --app-swatch:                   #166534;
+  --app-bg:                               #d3eedd;
+  --mat-sys-surface:                      #f5fdf7;
+  --mat-sys-surface-container-lowest:     #eaf7ee;
+  --mat-sys-surface-container-low:        #d3eedd;
+  --mat-sys-surface-container:            #b2e4c2;
+  --mat-sys-surface-container-high:       #93d8a8;
+  --mat-sys-surface-container-highest:    #78cb90;
+  --mat-sys-outline-variant:              #b2e4c2;
+  --mat-sys-outline:                      #5aad7a;
+}
+
+html.dark-theme[data-palette='forest-green'] {
+  --mat-sys-primary:              #6ee7b7;
+  --mat-sys-on-primary:           #052e16;
+  --mat-sys-primary-container:    #0f4f2a;
+  --mat-sys-on-primary-container: #bbf7d0;
+  --app-swatch:                   #6ee7b7;
+  --app-bg:                               #071408;
+  --mat-sys-surface:                      #0c1f0d;
+  --mat-sys-surface-container-lowest:     #071408;
+  --mat-sys-surface-container-low:        #0c1f0d;
+  --mat-sys-surface-container:            #122615;
+  --mat-sys-surface-container-high:       #1a321d;
+  --mat-sys-surface-container-highest:    #223f25;
+  --mat-sys-outline-variant:              #223f25;
+  --mat-sys-outline:                      #3a6040;
+}
+
+// ── Sunset Coral ─────────────────────────────────────────────────────────────
+html[data-palette='sunset-coral'] {
+  --mat-sys-primary:              #c2410c;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #ffedd5;
+  --mat-sys-on-primary-container: #431407;
+  --app-swatch:                   #c2410c;
+  --app-bg:                               #ffe8d6;
+  --mat-sys-surface:                      #fff9f5;
+  --mat-sys-surface-container-lowest:     #fff3eb;
+  --mat-sys-surface-container-low:        #ffe8d6;
+  --mat-sys-surface-container:            #ffd5b8;
+  --mat-sys-surface-container-high:       #ffc099;
+  --mat-sys-surface-container-highest:    #ffab80;
+  --mat-sys-outline-variant:              #ffd5b8;
+  --mat-sys-outline:                      #f09060;
+}
+
+html.dark-theme[data-palette='sunset-coral'] {
+  --mat-sys-primary:              #fdba74;
+  --mat-sys-on-primary:           #431407;
+  --mat-sys-primary-container:    #7c2d12;
+  --mat-sys-on-primary-container: #ffedd5;
+  --app-swatch:                   #fdba74;
+  --app-bg:                               #150a05;
+  --mat-sys-surface:                      #201208;
+  --mat-sys-surface-container-lowest:     #150a05;
+  --mat-sys-surface-container-low:        #201208;
+  --mat-sys-surface-container:            #2d1a0f;
+  --mat-sys-surface-container-high:       #3d2415;
+  --mat-sys-surface-container-highest:    #4d2e1c;
+  --mat-sys-outline-variant:              #3d2415;
+  --mat-sys-outline:                      #5a3830;
+}
+
+// ── Royal Violet ─────────────────────────────────────────────────────────────
+html[data-palette='royal-violet'] {
+  --mat-sys-primary:              #6d28d9;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #ede9fe;
+  --mat-sys-on-primary-container: #2e1065;
+  --app-swatch:                   #6d28d9;
+  --app-bg:                               #ebe4ff;
+  --mat-sys-surface:                      #faf8ff;
+  --mat-sys-surface-container-lowest:     #f4f0ff;
+  --mat-sys-surface-container-low:        #ebe4ff;
+  --mat-sys-surface-container:            #ddd4ff;
+  --mat-sys-surface-container-high:       #cec0ff;
+  --mat-sys-surface-container-highest:    #bfabff;
+  --mat-sys-outline-variant:              #ddd4ff;
+  --mat-sys-outline:                      #9878f0;
+}
+
+html.dark-theme[data-palette='royal-violet'] {
+  --mat-sys-primary:              #c4b5fd;
+  --mat-sys-on-primary:           #2e1065;
+  --mat-sys-primary-container:    #4c1d95;
+  --mat-sys-on-primary-container: #ede9fe;
+  --app-swatch:                   #c4b5fd;
+  --app-bg:                               #120d1e;
+  --mat-sys-surface:                      #1a1228;
+  --mat-sys-surface-container-lowest:     #120d1e;
+  --mat-sys-surface-container-low:        #1a1228;
+  --mat-sys-surface-container:            #221832;
+  --mat-sys-surface-container-high:       #2c2042;
+  --mat-sys-surface-container-highest:    #382a52;
+  --mat-sys-outline-variant:              #382a52;
+  --mat-sys-outline:                      #5040a0;
+}
+
+// ── Midnight Slate ────────────────────────────────────────────────────────────
+html[data-palette='midnight-slate'] {
+  --mat-sys-primary:              #334155;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #cbd5e1;
+  --mat-sys-on-primary-container: #0f172a;
+  --app-swatch:                   #1e293b;
+  --app-bg:                               #e2e8f0;
+  --mat-sys-surface:                      #f8fafc;
+  --mat-sys-surface-container-lowest:     #f1f5f9;
+  --mat-sys-surface-container-low:        #e2e8f0;
+  --mat-sys-surface-container:            #cbd5e1;
+  --mat-sys-surface-container-high:       #b0bec5;
+  --mat-sys-surface-container-highest:    #90a4ae;
+  --mat-sys-outline-variant:              #cbd5e1;
+  --mat-sys-outline:                      #78909c;
+}
+
+html.dark-theme[data-palette='midnight-slate'] {
+  --mat-sys-primary:              #94a3b8;
+  --mat-sys-on-primary:           #0f172a;
+  --mat-sys-primary-container:    #1e293b;
+  --mat-sys-on-primary-container: #e2e8f0;
+  --app-swatch:                   #94a3b8;
+  --app-bg:                               #020617;
+  --mat-sys-surface:                      #0a0f1e;
+  --mat-sys-surface-container-lowest:     #020617;
+  --mat-sys-surface-container-low:        #0a0f1e;
+  --mat-sys-surface-container:            #111827;
+  --mat-sys-surface-container-high:       #1e293b;
+  --mat-sys-surface-container-highest:    #273344;
+  --mat-sys-outline-variant:              #1e293b;
+  --mat-sys-outline:                      #334155;
+}
+
+// ── Executive Charcoal ────────────────────────────────────────────────────────
+html[data-palette='exec-charcoal'] {
+  --mat-sys-primary:              #374151;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #d1d5db;
+  --mat-sys-on-primary-container: #111827;
+  --app-swatch:                   #374151;
+  --app-bg:                               #e5e7eb;
+  --mat-sys-surface:                      #f9fafb;
+  --mat-sys-surface-container-lowest:     #f3f4f6;
+  --mat-sys-surface-container-low:        #e5e7eb;
+  --mat-sys-surface-container:            #d1d5db;
+  --mat-sys-surface-container-high:       #b6bac2;
+  --mat-sys-surface-container-highest:    #9ca3af;
+  --mat-sys-outline-variant:              #d1d5db;
+  --mat-sys-outline:                      #6b7280;
+}
+
+html.dark-theme[data-palette='exec-charcoal'] {
+  --mat-sys-primary:              #9ca3af;
+  --mat-sys-on-primary:           #111827;
+  --mat-sys-primary-container:    #1f2937;
+  --mat-sys-on-primary-container: #e5e7eb;
+  --app-swatch:                   #9ca3af;
+  --app-bg:                               #030712;
+  --mat-sys-surface:                      #0d1117;
+  --mat-sys-surface-container-lowest:     #030712;
+  --mat-sys-surface-container-low:        #0d1117;
+  --mat-sys-surface-container:            #161b22;
+  --mat-sys-surface-container-high:       #1f2937;
+  --mat-sys-surface-container-highest:    #29374a;
+  --mat-sys-outline-variant:              #1f2937;
+  --mat-sys-outline:                      #374151;
+}
+
+// ── Sapphire Blue ─────────────────────────────────────────────────────────────
+html[data-palette='sapphire'] {
+  --mat-sys-primary:              #1d4ed8;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #dbeafe;
+  --mat-sys-on-primary-container: #1e3a8a;
+  --app-swatch:                   #1d4ed8;
+  --app-bg:                               #dbeafe;
+  --mat-sys-surface:                      #f0f7ff;
+  --mat-sys-surface-container-lowest:     #e8f2ff;
+  --mat-sys-surface-container-low:        #dbeafe;
+  --mat-sys-surface-container:            #bfdbfe;
+  --mat-sys-surface-container-high:       #93c5fd;
+  --mat-sys-surface-container-highest:    #60a5fa;
+  --mat-sys-outline-variant:              #bfdbfe;
+  --mat-sys-outline:                      #3b82f6;
+}
+
+html.dark-theme[data-palette='sapphire'] {
+  --mat-sys-primary:              #93c5fd;
+  --mat-sys-on-primary:           #1e3a8a;
+  --mat-sys-primary-container:    #1e3a8a;
+  --mat-sys-on-primary-container: #dbeafe;
+  --app-swatch:                   #93c5fd;
+  --app-bg:                               #030c1f;
+  --mat-sys-surface:                      #071230;
+  --mat-sys-surface-container-lowest:     #030c1f;
+  --mat-sys-surface-container-low:        #071230;
+  --mat-sys-surface-container:            #0f1e48;
+  --mat-sys-surface-container-high:       #172860;
+  --mat-sys-surface-container-highest:    #1e3272;
+  --mat-sys-outline-variant:              #172860;
+  --mat-sys-outline:                      #2563eb;
+}
+
+// ── Copper Bronze ─────────────────────────────────────────────────────────────
+html[data-palette='copper-bronze'] {
+  --mat-sys-primary:              #92400e;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #fde68a;
+  --mat-sys-on-primary-container: #451a03;
+  --app-swatch:                   #92400e;
+  --app-bg:                               #fef3c7;
+  --mat-sys-surface:                      #fffbf0;
+  --mat-sys-surface-container-lowest:     #fef9e8;
+  --mat-sys-surface-container-low:        #fef3c7;
+  --mat-sys-surface-container:            #fde68a;
+  --mat-sys-surface-container-high:       #fcd34d;
+  --mat-sys-surface-container-highest:    #f59e0b;
+  --mat-sys-outline-variant:              #fde68a;
+  --mat-sys-outline:                      #d97706;
+}
+
+html.dark-theme[data-palette='copper-bronze'] {
+  --mat-sys-primary:              #fcd34d;
+  --mat-sys-on-primary:           #451a03;
+  --mat-sys-primary-container:    #78350f;
+  --mat-sys-on-primary-container: #fef3c7;
+  --app-swatch:                   #fcd34d;
+  --app-bg:                               #160d00;
+  --mat-sys-surface:                      #1f1400;
+  --mat-sys-surface-container-lowest:     #160d00;
+  --mat-sys-surface-container-low:        #1f1400;
+  --mat-sys-surface-container:            #2d1f00;
+  --mat-sys-surface-container-high:       #3d2c00;
+  --mat-sys-surface-container-highest:    #4d3800;
+  --mat-sys-outline-variant:              #3d2c00;
+  --mat-sys-outline:                      #a16207;
+}
+
+// ── Rose Gold ─────────────────────────────────────────────────────────────────
+html[data-palette='rose-gold'] {
+  --mat-sys-primary:              #be185d;
+  --mat-sys-on-primary:           #ffffff;
+  --mat-sys-primary-container:    #fce7f3;
+  --mat-sys-on-primary-container: #500724;
+  --app-swatch:                   #be185d;
+  --app-bg:                               #fce7f3;
+  --mat-sys-surface:                      #fff5fb;
+  --mat-sys-surface-container-lowest:     #fceef8;
+  --mat-sys-surface-container-low:        #fce7f3;
+  --mat-sys-surface-container:            #fbcfe8;
+  --mat-sys-surface-container-high:       #f9a8d4;
+  --mat-sys-surface-container-highest:    #f472b6;
+  --mat-sys-outline-variant:              #fbcfe8;
+  --mat-sys-outline:                      #ec4899;
+}
+
+html.dark-theme[data-palette='rose-gold'] {
+  --mat-sys-primary:              #f9a8d4;
+  --mat-sys-on-primary:           #500724;
+  --mat-sys-primary-container:    #831843;
+  --mat-sys-on-primary-container: #fce7f3;
+  --app-swatch:                   #f9a8d4;
+  --app-bg:                               #1a0510;
+  --mat-sys-surface:                      #270a1a;
+  --mat-sys-surface-container-lowest:     #1a0510;
+  --mat-sys-surface-container-low:        #270a1a;
+  --mat-sys-surface-container:            #350f24;
+  --mat-sys-surface-container-high:       #44152f;
+  --mat-sys-surface-container-highest:    #551b3c;
+  --mat-sys-outline-variant:              #44152f;
+  --mat-sys-outline:                      #9d174d;
+}

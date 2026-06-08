@@ -45,5 +45,13 @@
   &__actions {
     display: flex;
     align-items: center;
+    gap: 4px;
+  }
+
+  &__divider {
+    width: 1px;
+    height: 20px;
+    background: var(--mat-sys-outline-variant);
+    margin: 0 4px;
   }
 }

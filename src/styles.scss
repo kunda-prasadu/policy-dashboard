@@ -1,6 +1,10 @@
 
 // Include theming for Angular Material with `mat.theme()`.
 @use '@angular/material' as mat;
+// Custom palette overrides (5 named palettes via data-palette attribute on <html>)
+@use './app/themes/palettes';
+// Semantic status tokens — palette-independent
+@use './app/themes/tokens';
 
 // ─── Design Tokens ─────────────────────────────────────────────────────────────
 // Primary:   Chubb Navy  #1B3A6B  (professional deep blue)
@@ -36,11 +40,13 @@ html {
   --mat-sys-surface-container-highest:#b8c4d4;
   --mat-sys-outline-variant:          #e2e8f0;
   --mat-sys-outline:                  #94a3b8;
+  // Page background driven by custom property so palettes can override it
+  --app-bg: #f1f5f9;
 }
 
 body {
   color-scheme: light;
-  background-color: #f1f5f9;
+  background-color: var(--app-bg);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
   margin: 0;
@@ -63,10 +69,12 @@ html.dark-theme {
 
   --mat-sys-primary: #93b4ff;
   --mat-sys-on-primary: #002984;
+  // Dark page background
+  --app-bg: #0a1628;
 
   body {
     color-scheme: dark;
-    background-color: #0a1628;
+    background-color: var(--app-bg);
     color: var(--mat-sys-on-surface);
   }
 

@@ -4,11 +4,12 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService } from './core/services/theme.service';
+import { ThemePickerComponent } from './shared/theme-picker/theme-picker';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatIconButton, MatIconModule, MatTooltipModule],
+  imports: [RouterOutlet, MatIconButton, MatIconModule, MatTooltipModule, ThemePickerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

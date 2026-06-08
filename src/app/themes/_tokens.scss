@@ -1,0 +1,31 @@
+// ─── Semantic Status Tokens ───────────────────────────────────────────────────
+// These are intentionally palette-independent: policy status colours must stay
+// consistent so users can rely on them as data-encoding signals regardless of
+// which brand palette is active.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  --color-status-active:        #059669;
+  --color-status-active-bg:     #d1fae5;
+  --color-status-expiring:      #d97706;
+  --color-status-expiring-bg:   #fef3c7;
+  --color-status-expired:       #dc2626;
+  --color-status-expired-bg:    #fee2e2;
+  --color-status-cancelled:     #64748b;
+  --color-status-cancelled-bg:  #f1f5f9;
+  --color-status-pending:       #0284c7;
+  --color-status-pending-bg:    #e0f2fe;
+}
+
+html.dark-theme {
+  --color-status-active:        #34d399;
+  --color-status-active-bg:     #064e3b;
+  --color-status-expiring:      #fbbf24;
+  --color-status-expiring-bg:   #451a03;
+  --color-status-expired:       #f87171;
+  --color-status-expired-bg:    #450a0a;
+  --color-status-cancelled:     #94a3b8;
+  --color-status-cancelled-bg:  #1e293b;
+  --color-status-pending:       #38bdf8;
+  --color-status-pending-bg:    #082f49;
+}
