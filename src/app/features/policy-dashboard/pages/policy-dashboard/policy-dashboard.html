@@ -27,9 +27,16 @@
     @defer (on idle) {
       <app-bulk-action-bar />
 
-      <section class="dashboard-table">
-        <app-policy-table (rowClick)="openPolicyDetail($event)" />
-      </section>
+      @if (hasResults()) {
+        <section class="dashboard-table">
+          <app-policy-table (rowClick)="openPolicyDetail($event)" />
+        </section>
+      } @else {
+        <app-empty-state
+          title="No policies found"
+          description="Try adjusting your filters or clearing the search term"
+        />
+      }
     } @placeholder {
       <div class="table-placeholder" aria-busy="true" aria-label="Loading policy table…"></div>
     }

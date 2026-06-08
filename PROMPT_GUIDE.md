@@ -44,6 +44,376 @@ GLOBAL RULES — apply to all code you generate:
 
 ---
 
+## ⚡ 4-Hour Fast Track
+
+Three approaches for building the entire project in a 4-hour session. Pick one.
+
+---
+
+### Option A — 8 Big Prompts (~4 hours, recommended)
+
+One prompt per major layer. Run them in order. Each builds on the last.
+
+| Step | Time estimate |
+|---|---|
+| `ng new` + `npm install` | 20 min |
+| 8 AI prompts × ~15 min each | 120 min |
+| Debug + verify end-to-end | 60 min |
+| **Total** | **~200 min** |
+
+---
+
+#### Fast Prompt 1 — Scaffold & Config
+
+```
+Create a new Angular 20 standalone app called policy-dashboard with:
+- provideZonelessChangeDetection() + provideRouter + provideHttpClient(withFetch()) in app.config.ts
+- angular.json styles array: add "node_modules/material-icons/iconfont/material-icons.css" BEFORE src/styles.scss
+- environment.ts: { production: false, apiUrl: 'http://localhost:3000' }
+- src/index.html: title "Policy Hub — Chubb APAC", Roboto preload (non-render-blocking), NO Material Icons CDN link (served locally)
+- src/styles.scss: Material 3 CSS tokens (--mat-sys-primary, --mat-sys-surface, --mat-sys-on-surface, etc.),
+  html.dark-theme class for dark mode, global reset, reduced-motion media query
+- Install: npm install material-icons @angular/material json-server --legacy-peer-deps
+- mock-api/generate-data.js: generate 250 policies with faker — fields: id(uuid), policyNumber(POL-XXXXXX),
+  policyHolderName, lineOfBusiness(Property/Casualty/Marine/A&H), status(Active/Pending/Expired/Cancelled),
+  region(SGP/HKG/AUS/JPN/IND), premiumAmount(10000–2000000), currency(SGD/HKD/AUD/JPY/USD),
+  effectiveDate, expiryDate, underwriter, flaggedForReview(bool)
+- mock-api/db.json: run the script to seed 250 records
+- package.json: add "start:api": "json-server mock-api/db.json --port 3000"
+```
+
+#### Fast Prompt 2 — Models, Constants & Core Services
+
+```
+Create all models and core services:
+
+MODELS (src/app/features/policy-dashboard/models/):
+- policy.model.ts: Policy interface (id, policyNumber, policyHolderName,
+  lineOfBusiness: 'Property'|'Casualty'|'Marine'|'A&H',
+  status: 'Active'|'Pending'|'Expired'|'Cancelled',
+  region: 'SGP'|'HKG'|'AUS'|'JPN'|'IND',
+  premiumAmount, currency, effectiveDate, expiryDate, underwriter, flaggedForReview)
+- policy-filter.model.ts, pagination.model.ts, policy-summary.model.ts, policy-query-params.model.ts
+
+CONSTANTS (src/app/features/policy-dashboard/constants/):
+- policy.constants.ts: POLICY_STATUSES, REGIONS, LINES_OF_BUSINESS string arrays
+
+CORE SERVICES (src/app/core/services/):
+- storage.service.ts: root injectable, generic get<T>/set<T>/remove(key) — all try/catch guarded
+- theme.service.ts: root injectable, isDark=signal(false), toggle(), applies 'dark-theme' class to
+  document.documentElement, persists to localStorage key 'policy-hub-theme'
+- logger.service.ts: root injectable, debug/info/warn/error methods, suppressed in production via isDevMode()
+- error.interceptor.ts: functional interceptor, catches HTTP errors, normalises to string message
+
+All classes must have JSDoc comments.
+```
+
+#### Fast Prompt 3 — Signal Store & API Service
+
+```
+Create PolicyStore and PolicyApiService:
+
+src/app/features/policy-dashboard/services/policy-api.service.ts:
+- Root injectable, inject HttpClient and LoggerService
+- getAll(filters?, sort?): Observable<Policy[]> — builds query params: status/region/lineOfBusiness/minPremium
+  as server-side params, _sort/_order for sort, _limit=250
+- patch(id, changes): Observable<Policy>
+- flagPolicy(id): Observable<Policy> — PATCH {flaggedForReview:true};
+  pipe catchError to log + rethrow a typed Error
+- flagPolicies(ids: string[]): Observable<Policy[]> — forkJoin of individual flagPolicy calls;
+  single subscription handles the entire batch
+
+src/app/features/policy-dashboard/store/policy.store.ts — root injectable class (NOT @ngrx/signals):
+- Inject PolicyApiService, LoggerService, DestroyRef
+- Signals: policies, loading(bool), error(string|null), filters(PolicyFilter),
+  sort({active,direction}), selectedPolicyIds(string[])
+- Computed:
+  - filteredPolicies: guard with policies() ?? [] before filtering
+  - summary({active,pending,expired,cancelled,totalPremium,expiringWithin30Days,gwpByLob})
+  - selectedCount, hasSelection, totalPolicies
+- Methods: loadingPolicies(), updateFilters(), updateSort(), toggleSelection(id),
+  selectAll(ids[]), clearSelection(), flagSelectedPolicies(), renewPolicy(id)
+- loadingPolicies error handler: type err as HttpErrorResponse | Error; extract message safely
+- flagSelectedPolicies: call policyApiService.flagPolicies(selectedIds) via single forkJoin
+  subscription; pipe takeUntilDestroyed(destroyRef); rollback to snapshot on failure
+- renewPolicy(id): PATCH {status:'Active'}
+- All async methods log via LoggerService and write errors into error signal
+
+// WHY CUSTOM STORE OVER NgRx: NgRx requires actions + reducers + effects + selectors — ~4x the boilerplate
+// for a single-feature app. Angular signals give fine-grained reactivity with plain methods.
+```
+
+#### Fast Prompt 4 — PolicyTable Component
+
+```
+Create src/app/features/policy-dashboard/components/policy-table/ (.ts, .html, .scss):
+
+TypeScript — Inject: PolicyStore, StorageService, LOCALE_ID
+- output<Policy>() rowClick
+- displayedColumns = ['select','policyNumber','policyHolderName','lineOfBusiness','status','region','premium','flagged','actions']
+- dataSource = new MatTableDataSource<Policy>()
+- _pageIndex = signal(0), _pageSize = signal(savedPageSize ?? 10)
+- pageIds = computed(() => {
+    const data = store.filteredPolicies();
+    const start = _pageIndex() * _pageSize();
+    return data.slice(start, start + _pageSize()).map(p => p.id);
+  })
+- isAllOnPageSelected = computed(() => pageIds().length > 0 && pageIds().every(id => store.selectedPolicyIds().includes(id)))
+- isSomeOnPageSelected = computed(() => pageIds().some(id => store.selectedPolicyIds().includes(id)) && !isAllOnPageSelected())
+- constructor effect: dataSource.data = store.filteredPolicies(); paginator()?.firstPage(); _pageIndex.set(0)
+- ngAfterViewInit: inject DestroyRef; wire MatSort (server-side only — do NOT assign to dataSource.sort),
+  pipe sort.sortChange through takeUntilDestroyed(destroyRef);
+  wire MatPaginator (update _pageIndex/_pageSize on page event, persist pageSize to StorageService),
+  pipe paginator.page through takeUntilDestroyed(destroyRef)
+- toggleSelectAll(): isAllOnPageSelected() ? clearSelection() : selectAll(pageIds())
+- formatPremium(value, currencyCode): getCurrencySymbol + ≥1M→1.1M / ≥1K→123K / raw
+
+// WHY _pageIndex/_pageSize SIGNALS: dataSource.filteredData is updated asynchronously by
+// MatTableDataSource's RxJS pipeline. Reading it synchronously in an effect returns stale/empty data,
+// making isAllOnPageSelected always false. Deriving pageIds from store.filteredPolicies() is synchronous.
+
+HTML: mat-table, header checkbox [checked]="isAllOnPageSelected()" [indeterminate]="isSomeOnPageSelected()",
+all 9 columns, actions column has manage_search mat-icon-button that emits rowClick,
+mat-paginator [pageSizeOptions]="[10,25,50,100]" showFirstLastButtons
+```
+
+#### Fast Prompt 5 — Filter Components (PolicyFilter + FilterPanel)
+
+```
+1. src/app/features/policy-dashboard/components/policy-filter/ (.ts, .html, .scss):
+- Inject: FormBuilder, Router, ActivatedRoute, MatBottomSheet, StorageService, PolicyStore
+- FormGroup: { searchTerm, status, region, lineOfBusiness, startDate, endDate, minPremium:0 }
+- activeFilterCount = computed: count non-empty/non-zero advanced filter values (exclude searchTerm)
+- activeFilterChips = computed: Array<{key,label}> one entry per active filter (used for chip strip)
+- Constructor seed priority: URL query params → localStorage → defaults
+- formValueChanges (immediate): store.updateFilters()
+- formValueChanges pipe(debounceTime(400)): StorageService.set + router.navigate(replaceUrl)
+- openFilters(): open FilterPanel bottom sheet, afterDismissed patches form or calls store.loadingPolicies()
+- removeFilter(key): patch control to default, call store.loadingPolicies() for server-side enum filters
+- clearAllFilters(): reset all advanced fields, call store.loadingPolicies()
+- HTML: search field + "All Filters" button (badge when activeFilterCount > 0) + chip strip:
+    @if (activeFilterChips().length > 0) {
+      @for (chip of activeFilterChips(); track chip.key) {
+        <span class="active-filter-chip">{{ chip.label }} <button (click)="removeFilter(chip.key)">×</button></span>
+      }
+      <button (click)="clearAllFilters()">Clear all</button>
+    }
+
+2. src/app/features/policy-dashboard/components/filter-panel/ (.ts, .html, .scss):
+- Bottom sheet component, inject MAT_BOTTOM_SHEET_DATA (current filter values)
+- FormGroup seeded from injected data
+- apply(): dismiss with form value; reset(): dismiss with 'reset'
+```
+
+#### Fast Prompt 6 — SummaryPanel, BulkActionBar, DrilldownDialog
+
+```
+1. src/app/features/policy-dashboard/components/summary-panel/ (.ts, .html, .scss):
+- Inject PolicyStore, MatDialog
+- 4 clickable status cards (Active/Pending/Expired/Cancelled) with counts from store.summary()
+  — each click opens PolicyDrilldownDialog with { mode:'status', status }
+- SVG arc widget: % of active policies expiring within 30 days (animated stroke-dashoffset)
+- GWP animated progress bars per line of business
+- formatPremium helper
+
+2. src/app/features/policy-dashboard/components/bulk-action-bar/ (.ts, .html, .scss):
+- Inject PolicyStore, MatSnackBar
+- flagForReview(): capture count = store.selectedCount(), store.flagSelectedPolicies(),
+  snackBar.open('N policies flagged for review', 'Dismiss', 4000ms, panelClass:'snack-flag-success')
+- HTML: role="toolbar", selection count with aria-live="polite" aria-atomic="true", Clear + Flag buttons
+
+3. src/app/features/policy-dashboard/components/policy-drilldown-dialog/ (.ts, .html, .scss):
+- Inject MAT_DIALOG_DATA as DrilldownDialogData { mode:'status'|'expiring'|'detail', status?, policy? }
+- renewingIds = signal<Set<string>>(new Set())
+- detailPolicy = computed(() => store.policies().find(p => p.id === data.policy?.id) ?? data.policy) [detail mode]
+- renew(id): add to renewingIds → store.renewPolicy(id) → setTimeout remove after 1500ms
+- flagDetail(): store.selectAll([data.policy.id]) → store.flagSelectedPolicies()
+
+HTML TWO branches:
+@if (data.mode === 'detail') → single policy card:
+  status-pill + flag-pill badges, 2-column detail-grid with 9 fields (policyNumber, policyHolderName,
+  lineOfBusiness with lob-chip, region, premiumAmount, currency, effectiveDate, expiryDate + days-badge if ≤30d, underwriter),
+  detail-actions: Renew button (Expired/Cancelled only) + Flag for Review button (if !flaggedForReview)
+@if (data.mode !== 'detail') → mat-table:
+  filtered list with urgency badges (≤7d=critical/≤15d=high/≤30d=low), row tinting, renew buttons per row
+```
+
+#### Fast Prompt 7 — Dashboard Page, App Shell & Shared Components
+
+```
+1. src/app/features/policy-dashboard/pages/policy-dashboard/ (.ts, .html, .scss):
+- Inject PolicyStore, MatDialog
+- ngOnInit: store.loadingPolicies()
+- readonly hasResults = computed(() => store.filteredPolicies().length > 0)
+- openPolicyDetail(policy: Policy): dialog.open(PolicyDrilldownDialog, { data:{mode:'detail',policy}, width:'600px', maxWidth:'96vw' })
+- HTML:
+  <main class="dashboard">
+    <app-policy-filter />
+    <app-summary-panel />
+    @if (store.loading()) { <app-loading-skeleton /> }
+    @else if (store.error()) { <app-error-state (retryClick)="retry()" /> }
+    @else {
+      @defer (on idle) {
+        @if (store.hasSelection()) { <app-bulk-action-bar /> }
+        @if (hasResults()) {
+          <section class="dashboard-table">
+            <app-policy-table (rowClick)="openPolicyDetail($event)" />
+          </section>
+        } @else {
+          <app-empty-state
+            title="No policies found"
+            description="Try adjusting your filters" />
+        }
+      } @placeholder { <div aria-busy="true"></div> }
+    }
+  </main>
+
+2. src/app/shared/loading-skeleton/ — shimmer placeholder with CSS animation
+3. src/app/shared/error-state/ — error card with retryClick output()
+4. src/app/shared/empty-state/ — zero-result card with search_off icon, title and description inputs
+5. src/app/app.ts / app.html / app.scss — app shell:
+   header: "Policy Hub" title + "APAC Insurance Platform" subtitle + dark/light theme toggle button
+   ThemeService injection, toggle() on click, shows light_mode or dark_mode icon
+   <router-outlet />
+6. app.routes.ts: { path: '', component: PolicyDashboard }
+```
+
+#### Fast Prompt 8 — Unit Tests & CI
+
+```
+Write unit tests for the policy dashboard using Jasmine + Karma.
+
+CRITICAL RULES for all spec files:
+- Use real PolicyStore — never jasmine.createSpyObj for stores (signal graphs break with spies)
+- Always add provideZonelessChangeDetection() to every TestBed
+- Use provideHttpClientTesting() for HTTP-dependent services
+
+Write these specs:
+1. policy.store.spec.ts — 30 tests: loadingPolicies, updateFilters, summary counts, filteredPolicies,
+   toggleSelection, selectAll, clearSelection, flagSelectedPolicies (PATCH + clears), renewPolicy
+2. policy-api.service.spec.ts — 5 tests: GET no params, GET with status filter, PATCH flag, PATCH renew
+3. policy-table.spec.ts — 7 tests: creates, formatPremium (SGD/JPY/AUD), toggleSelectAll selects page ids,
+   toggleSelectAll clears when all selected
+4. policy-drilldown-dialog.spec.ts — 18 tests: detail mode shows policy fields, status mode shows table,
+   daysLeft, urgencyClass, renew adds to renewingIds
+5. summary-panel.spec.ts — 17 tests: expiringPct, arcOffset, barPct, formatPremium, openDrilldown
+6. bulk-action-bar.spec.ts — 4 tests: creates, flagForReview calls store, snackbar singular/plural
+7. filter-panel.spec.ts — 10 tests: creates, seeds form from data, apply emits values, reset emits 'reset'
+
+Create .github/workflows/ci.yml:
+- Triggers: push and pull_request on main
+- Steps: checkout, setup Node 20, npm ci --legacy-peer-deps, lint, test (ChromeHeadless --no-sandbox), build
+```
+
+---
+
+### Option B — Single Mega-Prompt (~2 hours building, ~1–2 hours debugging)
+
+Paste this into **GitHub Copilot Agent mode**. It scaffolds all files in one shot — expect to fix a few wiring issues afterward.
+
+```
+Build a complete Angular 20 insurance policy dashboard called "Policy Hub" for Chubb APAC.
+
+TECH STACK: Angular 20 standalone, provideZonelessChangeDetection(), Angular Material 3,
+custom signal store (NO NgRx), JSON Server mock API on port 3000, SCSS + BEM, Jasmine/Karma.
+
+INSTALL: npm install material-icons @angular/material json-server --legacy-peer-deps
+
+FILE STRUCTURE:
+src/app/
+  core/services/: storage.service.ts, theme.service.ts, logger.service.ts, error.interceptor.ts
+  features/policy-dashboard/
+    models/: policy.model.ts, policy-filter.model.ts, pagination.model.ts, policy-summary.model.ts
+    constants/: policy.constants.ts
+    store/: policy.store.ts           ← root injectable, all signals, NO NgRx
+    services/: policy-api.service.ts  ← HTTP GET/PATCH
+    components/: policy-table/, policy-filter/, filter-panel/, summary-panel/,
+                 bulk-action-bar/, policy-drilldown-dialog/
+    pages/policy-dashboard/
+  shared/: loading-skeleton/, error-state/
+mock-api/: db.json (250 seeded records), generate-data.js (faker)
+
+POLICY MODEL: { id, policyNumber(POL-XXXXXX), policyHolderName, lineOfBusiness(Property/Casualty/Marine/A&H),
+  status(Active/Pending/Expired/Cancelled), region(SGP/HKG/AUS/JPN/IND), premiumAmount, currency(SGD/HKD/AUD/JPY/USD),
+  effectiveDate, expiryDate, underwriter, flaggedForReview }
+
+STORE: inject PolicyApiService, LoggerService, DestroyRef
+  signals: policies, loading, error, filters, sort, selectedPolicyIds
+  computed:
+  - filteredPolicies: guard with policies() ?? [] before applying search/date client filters
+  - summary(counts+GWP+expiring30d), selectedCount, hasSelection
+  - hasResults: filteredPolicies().length > 0
+  methods: loadingPolicies, updateFilters, updateSort, toggleSelection, selectAll, clearSelection,
+           flagSelectedPolicies, renewPolicy
+  - loadingPolicies error handler: type err as HttpErrorResponse | Error; extract .message safely
+  - flagSelectedPolicies: call flagPolicies(selectedIds) via forkJoin (not per-id forEach);
+    pipe takeUntilDestroyed(destroyRef); optimistic update + snapshot rollback on error
+
+POLICY TABLE — CRITICAL checkbox fix:
+  _pageIndex=signal(0), _pageSize=signal(savedSize??10)
+  pageIds=computed(()=>store.filteredPolicies().slice(start,start+size).map(p=>p.id))
+  isAllOnPageSelected=computed(()=>pageIds().every(id=>store.selectedPolicyIds().includes(id)))
+  isSomeOnPageSelected=computed(()=>pageIds().some(...)&&!isAllOnPageSelected())
+  DO NOT read dataSource.filteredData synchronously — it is stale at effect time.
+  Header checkbox: [checked]="isAllOnPageSelected()" [indeterminate]="isSomeOnPageSelected()"
+  Actions column: manage_search mat-icon-button that emits output<Policy>() rowClick
+  pageSizeOptions: [10,25,50,100]
+  inject DestroyRef; pipe sort.sortChange and paginator.page through takeUntilDestroyed(destroyRef)
+
+FILTER BAR: activeFilterChips=computed() returns [{key,label}] for each active filter,
+  shown as removable chips below the search bar. removeFilter(key) + clearAllFilters().
+
+DRILLDOWN DIALOG — two modes:
+  mode:'detail' → single policy card: status-pill, flag-pill, 2-col grid of 9 fields,
+                  Renew button(Expired/Cancelled) + Flag button(!flaggedForReview)
+  mode:'status'|'expiring' → mat-table list with urgency badges + renew buttons
+
+DASHBOARD PAGE: ngOnInit→loadingPolicies(), hasResults=computed()→filteredPolicies().length>0,
+  openPolicyDetail(p)→dialog.open(mode:'detail',width:'600px'),
+  loading/error states outside @defer; @defer(on idle) wraps bulk bar + table;
+  @if(hasResults()) shows table, @else shows <app-empty-state>
+
+ICONS: angular.json styles[] += "node_modules/material-icons/iconfont/material-icons.css" — NO CDN link.
+THEME: ThemeService toggles 'dark-theme' class on <html>, persists to localStorage.
+STORAGE: all localStorage via StorageService.get<T>/set<T>/remove — no direct localStorage calls.
+
+Generate every file completely. Add JSDoc on all public methods. Add // WHY THIS APPROACH comments
+for: signal store choice, pageIds computed design, detail vs list dialog modes, hybrid filtering.
+```
+
+---
+
+### Option C — 4-Hour Cheat Sheet
+
+The minimum viable path. Skip docs; skip non-critical tests.
+
+| # | Task | Time | Can skip? |
+|---|---|---|---|
+| 1 | `ng new` + `npm install` deps | 15 min | — |
+| 2 | Models + constants | 10 min | — |
+| 3 | StorageService + ThemeService | 10 min | LoggerService |
+| 4 | mock-api generate-data.js + db.json | 10 min | — |
+| 5 | PolicyApiService | 10 min | — |
+| 6 | PolicyStore (signals + computed + methods) | 25 min | — |
+| 7 | PolicyTable | 25 min | — |
+| 8 | PolicyFilter + FilterPanel | 20 min | FilterPanel (use inline form only) |
+| 9 | SummaryPanel | 20 min | GWP bars + SVG arc |
+| 10 | BulkActionBar + DrilldownDialog | 20 min | — |
+| 11 | Dashboard page + App shell + routing | 15 min | — |
+| 12 | Global SCSS + Material 3 theme | 15 min | Dark mode |
+| 13 | Debug + verify end-to-end | 30 min | — |
+| 14 | Store + table unit tests only | 15 min | All other specs |
+| | **Total** | **~240 min** | |
+
+**Critical tips for speed:**
+- Run `ng g c features/policy-dashboard/components/policy-table --standalone` etc. to scaffold — only add the logic
+- Start `npm run start:api && npm start` from the first component; test in browser as you build each piece
+- Build the store first — all components just inject it; nothing else works without it
+- If a component breaks, move on; the store is the foundation, fix wiring at the end
+- Use `provideZonelessChangeDetection()` in every TestBed or tests will silently fail
+
+---
+
 ## PHASE 1 — Project Scaffold
 
 ### Prompt 1.1 — Create Angular project
@@ -391,6 +761,17 @@ export class PolicyApiService {
 
   flagPolicy(id: string): Observable<Policy>
     - PATCH this.baseUrl/:id with body { flaggedForReview: true }
+    - pipe catchError((err: HttpErrorResponse) => {
+        this.logger.error(`Failed to flag policy ${id}`, err)
+        return throwError(() => new Error(err.error?.message || err.statusText || 'Failed to flag policy'))
+      })
+
+  /**
+   * Flags multiple policies in parallel. Uses forkJoin so a single subscription
+   * in the store can handle success/failure for the entire batch (avoids N+1 subscriptions).
+   */
+  flagPolicies(ids: string[]): Observable<Policy[]>
+    - return forkJoin(ids.map(id => this.flagPolicy(id)))
 
   renewPolicy(id: string): Observable<Policy>
     - PATCH this.baseUrl/:id with body { status: 'Active' }
@@ -459,7 +840,7 @@ At the top of the file, before the class, add:
 
 @Injectable({ providedIn: 'root' })
 export class PolicyStore {
-  Inject: PolicyApiService, LoggerService
+  Inject: PolicyApiService, LoggerService, DestroyRef
 
   SIGNALS (writable):
   - policies = signal<Policy[]>([])
@@ -481,8 +862,11 @@ export class PolicyStore {
   // WHY COMPUTED: filteredPolicies is the single source of truth for the
   // table and summary panel. Client-side filters are applied here because
   // JSON Server cannot do cross-field OR search or reliable date range queries.
+  // Guard with ?? [] so a null/undefined policies signal never causes a
+  // runtime error during store initialisation.
   - filteredPolicies = computed(() => {
-      Apply client-side filters to policies():
+      const policies = this.policies() ?? [];
+      Apply client-side filters to policies:
       - searchTerm: case-insensitive match against policyNumber, policyHolderName, underwriter
       - status: exact match (skip if empty)
       - region: exact match (skip if empty)
@@ -516,7 +900,12 @@ export class PolicyStore {
       loading.set(true)
       policyApiService.getPolicies(filters(), sort()).subscribe({
         next: policies => { this.policies.set(policies); loading.set(false); logger.info(...) }
-        error: err => { error.set(err.message); loading.set(false); logger.error(...) }
+        error: (err: HttpErrorResponse | Error) => {
+          const message = err instanceof HttpErrorResponse
+            ? err.error?.message || err.statusText
+            : err.message;
+          error.set(message); loading.set(false); logger.error(...)
+        }
       })
 
   - updateFilters(filters: Partial<PolicyFilter>): void
@@ -540,6 +929,10 @@ export class PolicyStore {
   - selectAll(policyIds: string[]): void
 
   - flagSelectedPolicies(): void
+      // WHY FORKJOIN OVER FOREACH+SUBSCRIBE:
+      // Calling subscribe inside forEach creates N independent subscriptions with no
+      // lifecycle management. forkJoin merges all PATCH calls into one observable;
+      // a single takeUntilDestroyed(destroyRef) cleans up on component/service destroy.
       // WHY OPTIMISTIC UPDATE:
       // Updating the UI before the API responds makes the interaction feel
       // instant. The snapshot/rollback pattern ensures data integrity:
@@ -548,9 +941,12 @@ export class PolicyStore {
       1. Save snapshot = policies()
       2. Optimistic update: set flaggedForReview=true for all selectedIds
       3. clearSelection()
-      4. For each id: policyApiService.flagPolicy(id).subscribe({
-           error: () => { policies.set(snapshot); error.set('Failed to flag. Changes reverted.') }
-         })
+      4. policyApiService.flagPolicies(selectedIds)
+           .pipe(takeUntilDestroyed(destroyRef))
+           .subscribe({
+             next: () => { /* optimistic update already applied */ },
+             error: () => { policies.set(snapshot); error.set('Failed to flag. Changes reverted.') }
+           })
 
   - renewPolicy(id: string): void
       // WHY OPTIMISTIC UPDATE: Same snapshot/rollback pattern as flagSelectedPolicies.
@@ -611,9 +1007,28 @@ HTML:
 Spec: 1 test — component creates, retryClick emits on button click.
 ```
 
----
+### Prompt 8.3 — EmptyState
 
-## PHASE 9 — Feature Components
+```
+Create src/app/shared/empty-state/ (empty-state.ts, .html, .scss):
+
+Standalone component, selector: app-empty-state
+Imports: MatIconModule
+
+Inputs:
+- title: string = 'No policies found'
+- description: string = 'Try adjusting your filters'
+
+HTML:
+- Outer div role="status" aria-live="polite"
+- search_off mat-icon (aria-hidden="true")
+- h3 for title, p for description
+
+SCSS: matches the error-state card shell (border, padding, centred flex column);
+  use dashed border-style and muted icon opacity to distinguish from error state.
+
+Wire in policy-dashboard.ts imports[] alongside ErrorState and LoadingSkeleton.
+```
 
 ### Prompt 9.1 — PolicyTable component
 
@@ -639,7 +1054,8 @@ At the top of the .ts file add:
 // on page 3 after applying a filter that has fewer results.
 
 TypeScript:
-- Inject: PolicyStore, StorageService, LOCALE_ID
+- Inject: PolicyStore, StorageService, LOCALE_ID, DestroyRef
+- import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 - PAGE_SIZE_KEY = 'policy-page-size', DEFAULT_PAGE_SIZE = 10
 - displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged', 'actions']
 - dataSource = new MatTableDataSource<Policy>()
@@ -667,9 +1083,11 @@ TypeScript:
     _pageIndex.set(0); // reset so pageIds re-derives from page 0
   })
 - ngAfterViewInit:
-    - sort: subscribe to sortChange → store.updateSort() → store.loadingPolicies()
+    - sort: pipe sort.sortChange through takeUntilDestroyed(destroyRef) before subscribing;
+      subscribe to → store.updateSort() → store.loadingPolicies()
       (do NOT assign sort to dataSource — server-side sort)
-    - paginator: assign to dataSource, subscribe page → save pageSize to StorageService,
+    - paginator: assign to dataSource; pipe paginator.page through takeUntilDestroyed(destroyRef);
+      subscribe page → save pageSize to StorageService,
       update _pageIndex.set(e.pageIndex) and _pageSize.set(e.pageSize)
 - toggleSelectAll():
     if isAllOnPageSelected() → store.clearSelection()
@@ -950,9 +1368,18 @@ Inject: PolicyStore, MatDialog
 
 Imports: PolicyFilter, SummaryPanel, BulkActionBar, PolicyTable,
          LoadingSkeleton (from shared), ErrorState (from shared),
+         EmptyState (from shared),
          MatProgressSpinnerModule
 
 ngOnInit: store.loadingPolicies()
+
+// DECISION: hasResults computed() in the page component, not inside PolicyTable
+// ALTERNATIVES CONSIDERED: let MatTableDataSource show its own empty state
+// REASON: The empty state is a page-level concern — it must appear at the same
+// level as the table, not buried inside the table component. Using a computed()
+// in the container lets the template swap <app-policy-table> for
+// <app-empty-state> cleanly without any logic inside the table itself.
+readonly hasResults = computed(() => store.filteredPolicies().length > 0)
 
 // DECISION: openPolicyDetail() passes mode:'detail' + the full Policy object
 // ALTERNATIVES CONSIDERED: Passing only the policy ID and looking it up inside the dialog
@@ -968,29 +1395,34 @@ openPolicyDetail(policy: Policy):
   })
 
 HTML structure:
-<main class="dashboard" aria-label="Policy Dashboard">
-  <app-policy-filter />
-  <app-summary-panel />
+<div class="dashboard-container">
+  <header>...</header>
 
-  @defer (on idle) {
-    @if (store.hasSelection()) {
-      <app-bulk-action-bar />
-    }
-    <section class="table-section" aria-label="Policy list">
-      @if (store.loading()) {
-        <app-loading-skeleton />
-      } @else if (store.error()) {
-        <app-error-state
-          [message]="store.error()!"
-          (retryClick)="store.loadingPolicies()" />
-      } @else {
-        <app-policy-table (rowClick)="openPolicyDetail($event)" />
-      }
-    </section>
-  } @placeholder {
+  @if (store.loading()) {
     <app-loading-skeleton />
+  } @else if (store.error()) {
+    <app-error-state [message]="store.error()" (retryClick)="retry()" />
+  } @else {
+    <section class="dashboard-summary"><app-summary-panel /></section>
+    <section class="dashboard-filters"><app-policy-filter /></section>
+
+    @defer (on idle) {
+      <app-bulk-action-bar />
+
+      @if (hasResults()) {
+        <section class="dashboard-table">
+          <app-policy-table (rowClick)="openPolicyDetail($event)" />
+        </section>
+      } @else {
+        <app-empty-state
+          title="No policies found"
+          description="Try adjusting your filters or clearing the search term" />
+      }
+    } @placeholder {
+      <div class="table-placeholder" aria-busy="true"></div>
+    }
   }
-</main>
+</div>
 ```
 
 ---
@@ -1509,7 +1941,7 @@ Also verify:
 | **Constants** | policy.constants |
 | **Store** | policy.store, policy-dashboard.state |
 | **API Service** | policy-api.service |
-| **Shared Components** | loading-skeleton, error-state |
+| **Shared Components** | loading-skeleton, error-state, empty-state |
 | **Feature Components** | policy-table, summary-panel, filter-panel, policy-filter, bulk-action-bar, policy-drilldown-dialog |
 | **Pages** | policy-dashboard (container) |
 | **App Shell** | app.ts, app.html, app.scss, app.routes.ts |

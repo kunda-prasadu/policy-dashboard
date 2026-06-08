@@ -1,4 +1,5 @@
-import { Component, effect, inject, LOCALE_ID, viewChild, output, signal, computed } from '@angular/core';
+import { Component, DestroyRef, effect, inject, LOCALE_ID, viewChild, output, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PolicyStore } from '../../store/policy.store';
 import { CommonModule, getCurrencySymbol } from '@angular/common';
 import { Policy } from '../../models/policy.model';
@@ -21,6 +22,7 @@ export class PolicyTable {
   readonly store = inject(PolicyStore);
   private readonly storage = inject(StorageService);
   private readonly locale  = inject(LOCALE_ID);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** Emits the Policy the user clicked to view its details. */
   readonly rowClick = output<Policy>();
@@ -85,14 +87,14 @@ export class PolicyTable {
     // Wire server-side sort: each sort change triggers a fresh API fetch.
     // Do NOT assign sort to dataSource (that would cause client-side sorting instead).
     if (sort) {
-      sort.sortChange.subscribe(s => {
+      sort.sortChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(s => {
         this.store.updateSort(s.active, s.direction as 'asc' | 'desc' | '');
         this.store.loadingPolicies();
       });
     }
     if (paginator) {
       this.dataSource.paginator = paginator;
-      paginator.page.subscribe(e => {
+      paginator.page.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(e => {
         this.storage.set(PolicyTable.PAGE_SIZE_KEY, e.pageSize);
         // Update the tracking signals so pageIds computed re-derives for the new page.
         this._pageIndex.set(e.pageIndex);

@@ -1,4 +1,7 @@
-import { inject, Injectable, signal, computed } from '@angular/core';
+import { inject, Injectable, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 import { Policy } from '../models/policy.model';
 import { PolicyApiService } from '../services/policy-api.service';
 import { PolicyFilter } from '../models/policy-filter.model';
@@ -11,6 +14,7 @@ import { LoggerService } from '../../../core/services/logger.service';
 export class PolicyStore {
     private readonly policyApiService = inject(PolicyApiService);
     private readonly logger = inject(LoggerService);
+    private readonly destroyRef = inject(DestroyRef);
 
     readonly  policies = signal<Policy[]>([]);
 
@@ -33,7 +37,7 @@ export class PolicyStore {
     readonly totalPolicies = computed(() => this.policies().length);
 
     readonly filteredPolicies = computed(() => {
-        const policies = this.policies();
+        const policies = this.policies() ?? [];
         const filters = this.filters();
 
         return policies.filter(policy => {
@@ -88,8 +92,11 @@ export class PolicyStore {
                 this.loading.set(false);
                 this.logger.info(`Loaded ${policies.length} policies`);
             },
-            error: (err) => {
-                this.error.set(err.message);
+            error: (err: HttpErrorResponse | Error) => {
+                const message = err instanceof HttpErrorResponse
+                    ? err.error?.message || err.statusText
+                    : err.message;
+                this.error.set(message);
                 this.loading.set(false);
                 this.logger.error('Failed to load policies', err);
             }
@@ -141,16 +148,17 @@ export class PolicyStore {
         this.policies.set(updatedPolicies);
         this.clearSelection();
 
-        // Persist each flagged policy to the backend; rollback on failure
-        selectedIds.forEach(id => {
-            this.policyApiService.flagPolicy(id).subscribe({
+        // Persist all flagged policies in parallel; rollback on any failure
+        this.policyApiService.flagPolicies(selectedIds)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: () => { /* optimistic update already applied */ },
                 error: (err) => {
-                    this.logger.error(`Failed to flag policy ${id} — rolling back`, err);
+                    this.logger.error('Failed to flag policies — rolling back', err);
                     this.policies.set(snapshot);
-                    this.error.set(`Failed to flag policy ${id}. Changes have been reverted.`);
+                    this.error.set('Failed to flag policies. Changes have been reverted.');
                 },
             });
-        });
     }
 
     renewPolicy(id: string): void {

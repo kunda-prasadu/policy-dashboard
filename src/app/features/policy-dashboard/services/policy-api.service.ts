@@ -1,16 +1,18 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { catchError, forkJoin, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Policy } from '../models/policy.model';
 import { PolicyFilter } from '../models/policy-filter.model';
 import { SortState } from '../models/sort.model';
+import { LoggerService } from '../../../core/services/logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PolicyApiService {
 private readonly http = inject(HttpClient);
+private readonly logger = inject(LoggerService);
 
 private readonly baseUrl = `${environment.apiUrl}/policies`;
 
@@ -36,7 +38,20 @@ getPolicies(filters?: Partial<PolicyFilter>, sort?: SortState): Observable<Polic
 }
 
 flagPolicy(id: string): Observable<Policy> {
-  return this.http.patch<Policy>(`${this.baseUrl}/${id}`, { flaggedForReview: true });
+  return this.http.patch<Policy>(`${this.baseUrl}/${id}`, { flaggedForReview: true }).pipe(
+    catchError((err: HttpErrorResponse) => {
+      this.logger.error(`Failed to flag policy ${id}`, err);
+      return throwError(() => new Error(err.error?.message || err.statusText || 'Failed to flag policy'));
+    })
+  );
+}
+
+/**
+ * Flags multiple policies in parallel. Uses forkJoin so a single subscription
+ * in the store can handle success/failure for the entire batch.
+ */
+flagPolicies(ids: string[]): Observable<Policy[]> {
+  return forkJoin(ids.map(id => this.flagPolicy(id)));
 }
 
 renewPolicy(id: string): Observable<Policy> {

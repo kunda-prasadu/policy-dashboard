@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { PolicyStore } from '../../store/policy.store';
 import { PolicyFilter } from '../../components/policy-filter/policy-filter';
 import { SummaryPanel } from '../../components/summary-panel/summary-panel';
@@ -6,6 +6,7 @@ import { PolicyTable } from '../../components/policy-table/policy-table';
 import { BulkActionBar } from '../../components/bulk-action-bar/bulk-action-bar';
 import { LoadingSkeleton } from '../../../../shared/loading-skeleton/loading-skeleton';
 import { ErrorState } from '../../../../shared/error-state/error-state';
+import { EmptyState } from '../../../../shared/empty-state/empty-state';
 import { MatDialog } from '@angular/material/dialog';
 import { PolicyDrilldownDialog } from '../../components/policy-drilldown-dialog/policy-drilldown-dialog';
 import { Policy } from '../../models/policy.model';
@@ -13,13 +14,15 @@ import { Policy } from '../../models/policy.model';
 @Component({
   selector: 'app-policy-dashboard',
   standalone: true,
-  imports: [SummaryPanel, PolicyTable, BulkActionBar, PolicyFilter, LoadingSkeleton, ErrorState],
+  imports: [SummaryPanel, PolicyTable, BulkActionBar, PolicyFilter, LoadingSkeleton, ErrorState, EmptyState],
   templateUrl: './policy-dashboard.html',
   styleUrls: ['./policy-dashboard.scss'],
 })
 export class PolicyDashboard implements OnInit {
   readonly store = inject(PolicyStore);
   private readonly dialog = inject(MatDialog);
+
+  readonly hasResults = computed(() => this.store.filteredPolicies().length > 0);
 
   ngOnInit(): void {
     this.store.loadingPolicies();
