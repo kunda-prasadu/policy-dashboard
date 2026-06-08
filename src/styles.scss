@@ -80,6 +80,18 @@ html.dark-theme {
   --mat-sys-outline:                  #4a6080;
 }
 
+// ─── Reduced-motion: disable all transitions/animations for users who prefer ─
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 // ─── Snackbar panel classes (global — snackbars render outside component scope) ───
 .snack-flag-success {
   .mdc-snackbar__surface {

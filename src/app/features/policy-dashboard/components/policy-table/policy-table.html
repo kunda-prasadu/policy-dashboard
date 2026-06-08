@@ -2,7 +2,7 @@
        aria-label="Policy data table">
     <!-- Select Checkbox -->
     <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef scope="col">
             <mat-checkbox (change)="toggleSelectAll()" aria-label="Select all policies"></mat-checkbox>
         </th>
         <td mat-cell *matCellDef="let policy">
@@ -11,22 +11,22 @@
     </ng-container>
     <!-- Policy Number Column -->
     <ng-container matColumnDef="policyNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Policy No.</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Policy No.</th>
         <td mat-cell *matCellDef="let policy" class="cell-policy-number">{{ policy.policyNumber }}</td>
     </ng-container>
     <!-- Policy Holder Name Column -->
     <ng-container matColumnDef="policyHolderName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Policy Holder</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Policy Holder</th>
         <td mat-cell *matCellDef="let policy">{{ policy.policyHolderName }}</td>
     </ng-container>
     <!-- Line of Business Column -->
     <ng-container matColumnDef="lineOfBusiness">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Line of Business</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Line of Business</th>
         <td mat-cell *matCellDef="let policy">{{ policy.lineOfBusiness }}</td>
     </ng-container>
     <!-- Status Column -->
     <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Status</th>
         <td mat-cell *matCellDef="let policy">
           <span class="status-badge status-badge--{{policy.status.toLowerCase()}}">
             <span class="status-badge__dot"></span>{{ policy.status }}
@@ -35,12 +35,12 @@
     </ng-container>
     <!-- Region -->
     <ng-container matColumnDef="region">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Region</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Region</th>
         <td mat-cell *matCellDef="let policy">{{ policy.region }}</td>
     </ng-container>
     <!-- Premium Column -->
     <ng-container matColumnDef="premium">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Premium</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Premium</th>
         <td mat-cell *matCellDef="let policy" class="cell-premium">
           <span class="premium-amount">{{ formatPremium(policy.premiumAmount, policy.currency) }}</span>
         </td>
@@ -48,7 +48,7 @@
 
     <!-- Flagged Column -->
     <ng-container matColumnDef="flagged">
-        <th mat-header-cell *matHeaderCellDef class="col-flagged">
+        <th mat-header-cell *matHeaderCellDef class="col-flagged" scope="col">
           <mat-icon class="col-flag-header" matTooltip="Flagged for Review" aria-hidden="true">flag</mat-icon>
         </th>
         <td mat-cell *matCellDef="let policy" class="col-flagged">

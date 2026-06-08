@@ -59,6 +59,22 @@ describe('PolicyApiService', () => {
       expect(req.request.params.keys().length).toBe(0);
       req.flush([]);
     });
+
+    it('sends _sort and _order params when a sort state is provided', () => {
+      service.getPolicies({}, { active: 'premiumAmount', direction: 'desc' }).subscribe();
+      const req = httpMock.expectOne(r => r.url === BASE);
+      expect(req.request.params.get('_sort')).toBe('premiumAmount');
+      expect(req.request.params.get('_order')).toBe('desc');
+      req.flush([]);
+    });
+
+    it('omits _sort and _order when sort direction is empty', () => {
+      service.getPolicies({}, { active: 'status', direction: '' }).subscribe();
+      const req = httpMock.expectOne(r => r.url === BASE);
+      expect(req.request.params.has('_sort')).toBeFalse();
+      expect(req.request.params.has('_order')).toBeFalse();
+      req.flush([]);
+    });
   });
 
   describe('flagPolicy', () => {

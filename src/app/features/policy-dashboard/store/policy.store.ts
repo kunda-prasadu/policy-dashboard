@@ -82,7 +82,7 @@ export class PolicyStore {
         this.loading.set(true);
         this.logger.info('Loading policies from API');
 
-        this.policyApiService.getPolicies(this.filters()).subscribe({
+        this.policyApiService.getPolicies(this.filters(), this.sort()).subscribe({
             next: (policies) => {
                 this.policies.set(policies);
                 this.loading.set(false);
@@ -129,6 +129,9 @@ export class PolicyStore {
         const selectedIds = this.selectedPolicyIds();
         this.logger.info(`Flagging ${selectedIds.length} policies for review`);
 
+        // Snapshot for rollback if any API call fails
+        const snapshot = this.policies();
+
         // Optimistic update — reflect in UI immediately
         const updatedPolicies = this.policies().map(policy =>
             selectedIds.includes(policy.id)
@@ -138,23 +141,33 @@ export class PolicyStore {
         this.policies.set(updatedPolicies);
         this.clearSelection();
 
-        // Persist each flagged policy to the backend
+        // Persist each flagged policy to the backend; rollback on failure
         selectedIds.forEach(id => {
             this.policyApiService.flagPolicy(id).subscribe({
-                error: (err) => this.logger.error(`Failed to flag policy ${id}`, err),
+                error: (err) => {
+                    this.logger.error(`Failed to flag policy ${id} — rolling back`, err);
+                    this.policies.set(snapshot);
+                    this.error.set(`Failed to flag policy ${id}. Changes have been reverted.`);
+                },
             });
         });
     }
 
     renewPolicy(id: string): void {
         this.logger.info(`Renewing policy ${id}`);
+        // Snapshot for rollback
+        const snapshot = this.policies();
         // Optimistic update — change status to Active immediately
         this.policies.update(all =>
             all.map(p => p.id === id ? { ...p, status: 'Active' as const } : p)
         );
-        // Persist to backend
+        // Persist to backend; rollback on failure
         this.policyApiService.renewPolicy(id).subscribe({
-            error: (err) => this.logger.error(`Failed to renew policy ${id}`, err),
+            error: (err) => {
+                this.logger.error(`Failed to renew policy ${id} — rolling back`, err);
+                this.policies.set(snapshot);
+                this.error.set(`Failed to renew policy. Changes have been reverted.`);
+            },
         });
     }
 }

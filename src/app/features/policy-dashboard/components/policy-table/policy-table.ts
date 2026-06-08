@@ -1,6 +1,7 @@
 import { Component, effect, inject, LOCALE_ID, viewChild } from '@angular/core';
 import { PolicyStore } from '../../store/policy.store';
 import { CommonModule, getCurrencySymbol } from '@angular/common';
+import { Policy } from '../../models/policy.model';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -25,7 +26,7 @@ export class PolicyTable {
   private static readonly DEFAULT_PAGE_SIZE = 10;
 
   displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged'];
-  dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<Policy>();
   readonly initialPageSize = this.storage.get<number>(PolicyTable.PAGE_SIZE_KEY) ?? PolicyTable.DEFAULT_PAGE_SIZE;
 
   sort = viewChild(MatSort);
@@ -42,7 +43,14 @@ export class PolicyTable {
   ngAfterViewInit() {
     const sort = this.sort();
     const paginator = this.paginator();
-    if (sort) this.dataSource.sort = sort;
+    // Wire server-side sort: each sort change triggers a fresh API fetch.
+    // Do NOT assign sort to dataSource (that would cause client-side sorting instead).
+    if (sort) {
+      sort.sortChange.subscribe(s => {
+        this.store.updateSort(s.active, s.direction as 'asc' | 'desc' | '');
+        this.store.loadingPolicies();
+      });
+    }
     if (paginator) {
       this.dataSource.paginator = paginator;
       paginator.page.subscribe(e => {
@@ -59,7 +67,7 @@ export class PolicyTable {
     const paginator = this.paginator();
     const pageStart = paginator ? paginator.pageIndex * paginator.pageSize : 0;
     const pageEnd = paginator ? pageStart + paginator.pageSize : this.dataSource.filteredData.length;
-    const pageIds = this.dataSource.filteredData.slice(pageStart, pageEnd).map((p: any) => p.id);
+    const pageIds = this.dataSource.filteredData.slice(pageStart, pageEnd).map((p: Policy) => p.id);
     const allSelected = pageIds.every((id: string) => this.store.selectedPolicyIds().includes(id));
     if (allSelected) {
       this.store.clearSelection();
