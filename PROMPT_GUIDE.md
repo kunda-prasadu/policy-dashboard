@@ -6,6 +6,44 @@
 
 ---
 
+## Global Rules — Apply to Every Prompt
+
+These three rules must be enforced in **every phase**. Include them at the top of every prompt you send, or paste this block before any individual prompt.
+
+```
+GLOBAL RULES — apply to all code you generate:
+
+1. CODE COMMENTS
+   - Every class, service, component, and store must have a JSDoc comment explaining its
+     single responsibility (what it does, NOT how).
+   - Every public method and function must have a JSDoc comment that explains:
+       a) What it does
+       b) Why it exists (what problem it solves)
+       c) Any non-obvious side effects or state mutations
+   - Every computed signal and effect must have an inline comment explaining what it
+     derives and why that derivation lives here rather than elsewhere.
+   - Every RxJS pipe operator chain must have a comment above it explaining the full
+     data flow in plain English.
+
+2. APPROACH EXPLANATION
+   - Before writing any class, method, or block of logic, add a comment block:
+       // WHY THIS APPROACH: ...
+     Explain why you chose this pattern over the most obvious alternative.
+     Example: if using a signal instead of a BehaviorSubject, say so and explain why.
+     If using MatTableDataSource instead of a custom data array, explain the trade-off.
+
+3. DECISION JUSTIFICATION
+   - Whenever you make an architectural or API choice (e.g. standalone vs NgModule,
+     server-side vs client-side filter, functional vs class-based interceptor),
+     add a comment block:
+       // DECISION: [choice made]
+       // ALTERNATIVES CONSIDERED: [what else was possible]
+       // REASON: [why this was preferred]
+     Place this at the top of the file or immediately above the relevant code.
+```
+
+---
+
 ## PHASE 1 — Project Scaffold
 
 ### Prompt 1.1 — Create Angular project
@@ -21,6 +59,19 @@ Create a new Angular 20 standalone application called "policy-dashboard" with:
 
 Run: ng new policy-dashboard --standalone --style=scss --ssr=true --routing=true
 Then: ng add @angular/material --theme=azure-blue --typography=true --animations=enabled
+
+In the generated README or a top-level comment block in app.config.ts, add:
+// DECISION: Angular 20 standalone components
+// ALTERNATIVES CONSIDERED: NgModule-based architecture
+// REASON: Standalone components remove the indirection of declaring components in
+// NgModules, reduce boilerplate, and align with Angular's long-term direction.
+// They also make lazy loading simpler — each component is self-contained.
+
+// DECISION: Zoneless change detection (provideZonelessChangeDetection)
+// ALTERNATIVES CONSIDERED: Default zone.js-based CD
+// REASON: Zoneless CD removes the zone.js monkey-patching overhead. Combined with
+// signals, every re-render is precisely triggered by signal mutations — no
+// unnecessary traversal of the component tree.
 ```
 
 ### Prompt 1.2 — Install additional dependencies
@@ -197,7 +248,26 @@ export class StorageService {
 }
 
 All methods must have try/catch — never throw, never use 'any' type.
-Add JSDoc explaining it is the single seam for all localStorage access.
+
+Add JSDoc comments for every method in this format:
+/**
+ * Retrieves and deserialises a value from localStorage.
+ *
+ * WHY: A single typed wrapper prevents scattered JSON.parse calls
+ * throughout the codebase and centralises error handling for
+ * malformed stored data.
+ *
+ * @param key The storage key to read.
+ * @returns The parsed value, or null if absent or unparseable.
+ */
+
+At the top of the file add:
+// DECISION: Generic get<T> / set<T> over named methods (e.g. getTheme / setTheme)
+// ALTERNATIVES CONSIDERED: Dedicated typed methods per concern
+// REASON: A generic API keeps the service open for extension without
+// modification. Callers own the key names, preventing tight coupling.
+// Try/catch in every method ensures the app never crashes due to
+// localStorage being unavailable (e.g. private browsing, quota exceeded).
 ```
 
 ### Prompt 5.2 — LoggerService
@@ -215,6 +285,15 @@ export class LoggerService {
   - error(message: string, ...args: unknown[]): void
   - Only debug() is suppressed in production; info/warn/error always log
 }
+
+At the top of the file add:
+// DECISION: Custom LoggerService wrapping console
+// ALTERNATIVES CONSIDERED: Direct console.log calls throughout the codebase
+// REASON: Wrapping console in a service lets us gate debug output by environment,
+// add a consistent prefix for filtering in DevTools, and makes the
+// logging seam mockable in unit tests without polluting test output.
+
+JSDoc for each method must state which environments the call produces output in.
 ```
 
 ### Prompt 5.3 — ThemeService
@@ -236,6 +315,21 @@ export class ThemeService {
     set StorageService value
   
 No direct localStorage calls — all storage via StorageService.
+
+At the top of the file add:
+// DECISION: CSS class toggle ('dark-theme') on document.documentElement
+// ALTERNATIVES CONSIDERED: Angular CDK OverlayContainer, separate stylesheet load
+// REASON: Toggling a class on <html> allows Material 3 design tokens to be
+// overridden in a single .dark-theme {} block in styles.scss. It is
+// synchronous, avoids flash of unstyled content, and does not require
+// loading additional stylesheets at runtime.
+
+// WHY THIS APPROACH (resolveInitialTheme):
+// Priority order — stored preference > system preference > light default —
+// ensures returning users get their last chosen theme while new users
+// get a theme matching their OS setting automatically.
+
+JSDoc for every method explaining the side effects on DOM and storage.
 ```
 
 ### Prompt 5.4 — HTTP Error Interceptor
@@ -254,6 +348,22 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 }
 
 Wire it in app.config.ts via withInterceptors([errorInterceptor])
+
+At the top of the file add:
+// DECISION: Functional interceptor (HttpInterceptorFn) over class-based interceptor
+// ALTERNATIVES CONSIDERED: Class implementing HttpInterceptor with useClass
+// REASON: Functional interceptors are the Angular 15+ idiomatic pattern.
+// They are tree-shakeable, do not require a class instantiation, and
+// work directly with inject() — aligning with the signals/functional
+// direction of the framework.
+
+// WHY THIS APPROACH (error normalisation):
+// status === 0 means the request never reached the server (network
+// failure, CORS, offline). Separating this from HTTP status errors
+// gives users a more actionable message instead of a raw 0 status code.
+
+The interceptor function itself must have a JSDoc comment explaining
+what it intercepts, what it does on error, and what it passes through.
 ```
 
 ---
@@ -286,8 +396,25 @@ export class PolicyApiService {
     - PATCH this.baseUrl/:id with body { status: 'Active' }
 }
 
-Comment explaining WHY free-text search and date range are client-side:
-JSON Server v1 beta lacks cross-field OR search and reliable ISO date comparison.
+At the top of the file add:
+// DECISION: Hybrid server + client filtering
+// ALTERNATIVES CONSIDERED: All filtering on server / all filtering on client
+// REASON: Enum filters (status, region, lineOfBusiness) are sent to the server
+// because JSON Server supports exact-match query params natively — this keeps
+// the response payload small. Free-text search (searchTerm) and date range
+// filters are handled client-side because JSON Server v1 beta does not support
+// cross-field OR queries or reliable ISO date range comparison.
+
+// DECISION: PATCH (not PUT) for flag and renew operations
+// ALTERNATIVES CONSIDERED: PUT with full policy body
+// REASON: PATCH expresses intent — only the changed field is sent.
+// PUT would require sending the entire policy object, creating a
+// race condition risk if another field changed concurrently.
+
+JSDoc for every public method must include:
+- What HTTP verb and URL it calls
+- Which params are sent to the server vs handled elsewhere
+- The return type and what the observable emits
 ```
 
 ---
@@ -315,6 +442,21 @@ Export DEFAULT_FILTERS: PolicyFilter = {
 ```
 Create src/app/features/policy-dashboard/store/policy.store.ts using Angular signals (NO NgRx):
 
+At the top of the file, before the class, add:
+// DECISION: Custom Signal Store over NgRx
+// ALTERNATIVES CONSIDERED: NgRx Store + Effects, NgRx Signal Store, NGXS, Akita
+// REASON: NgRx adds ~15KB, boilerplate actions/reducers/effects, and a
+// steeper learning curve for a single-feature dashboard. Angular's built-in
+// signals (signal, computed, effect) cover all required reactivity with zero
+// extra dependencies and direct TypeScript type safety.
+
+// DECISION: @Injectable({ providedIn: 'root' }) singleton store
+// ALTERNATIVES CONSIDERED: Component-level store, feature-level providers
+// REASON: All dashboard components read from the same policy list. A singleton
+// ensures the filter state, selection state, and loaded data are shared
+// without prop drilling or additional DI configuration.
+
+
 @Injectable({ providedIn: 'root' })
 export class PolicyStore {
   Inject: PolicyApiService, LoggerService
@@ -328,10 +470,17 @@ export class PolicyStore {
   - sort = signal<SortState>({ active:'', direction:'' })
   - selectedPolicyIds = signal<string[]>([])
 
-  COMPUTED SIGNALS:
+  COMPUTED SIGNALS (add a comment above each explaining what it derives and why it's computed here):
+  // WHY COMPUTED: selectedCount avoids scanning the array in multiple places.
+  // Recomputes only when selectedPolicyIds signal changes.
   - selectedCount = computed(() => selectedPolicyIds().length)
+  // WHY COMPUTED: hasSelection is a boolean gate used in templates and methods.
+  // Derived from selectedCount so it shares the same memo.
   - hasSelection = computed(() => selectedCount() > 0)
   - totalPolicies = computed(() => policies().length)
+  // WHY COMPUTED: filteredPolicies is the single source of truth for the
+  // table and summary panel. Client-side filters are applied here because
+  // JSON Server cannot do cross-field OR search or reliable date range queries.
   - filteredPolicies = computed(() => {
       Apply client-side filters to policies():
       - searchTerm: case-insensitive match against policyNumber, policyHolderName, underwriter
@@ -350,8 +499,20 @@ export class PolicyStore {
       - expiringWithin30Days: expiryDate between today and today+30 days
     })
 
-  METHODS:
+  METHODS (add JSDoc to every method in this exact format):
+  /**
+   * <What it does in one sentence>
+   *
+   * WHY THIS APPROACH: <why this pattern was chosen, e.g. why optimistic update>
+   * SIDE EFFECTS: <any signals mutated, any observable subscriptions started>
+   */
+
   - loadingPolicies(): void
+      // WHY: Triggers a fresh API fetch using the current filter + sort state.
+      // This is always called after filter/sort changes rather than auto-subscribing
+      // inside the computed because it needs to be explicitly triggered
+      // (filter changes should not fire API calls on every keystroke — that is
+      // debounced in the PolicyFilter component).
       loading.set(true)
       policyApiService.getPolicies(filters(), sort()).subscribe({
         next: policies => { this.policies.set(policies); loading.set(false); logger.info(...) }
@@ -359,11 +520,16 @@ export class PolicyStore {
       })
 
   - updateFilters(filters: Partial<PolicyFilter>): void
+      // WHY: Partial update avoids callers having to spread existing state.
+      // Uses update() not set() to safely merge rather than replace.
       filters.update(current => ({ ...current, ...filters }))
 
   - updatePagination(pageIndex, pageSize?): void
 
   - updateSort(active, direction): void
+      // WHY: Sort state is stored in the signal store (not in MatSort)
+      // so that sort is part of the serialisable app state and can be
+      // passed to the API on every loadingPolicies() call.
       sort.set({ active, direction })
 
   - toggleSelection(policyId: string): void
@@ -374,6 +540,11 @@ export class PolicyStore {
   - selectAll(policyIds: string[]): void
 
   - flagSelectedPolicies(): void
+      // WHY OPTIMISTIC UPDATE:
+      // Updating the UI before the API responds makes the interaction feel
+      // instant. The snapshot/rollback pattern ensures data integrity:
+      // if any PATCH fails, the entire policies signal is restored to its
+      // pre-action state and an error message is shown.
       1. Save snapshot = policies()
       2. Optimistic update: set flaggedForReview=true for all selectedIds
       3. clearSelection()
@@ -382,6 +553,9 @@ export class PolicyStore {
          })
 
   - renewPolicy(id: string): void
+      // WHY OPTIMISTIC UPDATE: Same snapshot/rollback pattern as flagSelectedPolicies.
+      // The policy's status is set to 'Active' immediately in the UI.
+      // If the API call fails, the snapshot is restored.
       1. Save snapshot = policies()
       2. Optimistic update: set status='Active' for matching id
       3. policyApiService.renewPolicy(id).subscribe({
@@ -449,6 +623,21 @@ Create src/app/features/policy-dashboard/components/policy-table/ (.ts, .html, .
 Standalone, selector: app-policy-table
 Imports: MatTableModule, MatSortModule, MatPaginatorModule, MatCheckboxModule, MatIconModule, MatTooltipModule
 
+At the top of the .ts file add:
+// DECISION: MatTableDataSource<Policy> over a plain Policy[] array bound to mat-table
+// ALTERNATIVES CONSIDERED: Plain array with manual pagination slice
+// REASON: MatTableDataSource handles paginator and filter plumbing automatically.
+// However, we do NOT assign MatSort to dataSource.sort because sorting is
+// server-side — assigning it would cause MatTable to re-sort the current page
+// data in the browser instead of fetching a fresh sorted result from the API.
+
+// DECISION: effect() to sync store.filteredPolicies() → dataSource.data
+// ALTERNATIVES CONSIDERED: async pipe in template, manual subscribe
+// REASON: effect() runs outside the template, so it works even if the table
+// is not yet rendered. It also calls paginator()?.firstPage() to reset
+// pagination whenever the data changes — without this the user could be
+// on page 3 after applying a filter that has fewer results.
+
 TypeScript:
 - Inject: PolicyStore, StorageService, LOCALE_ID
 - PAGE_SIZE_KEY = 'policy-page-size', DEFAULT_PAGE_SIZE = 10
@@ -464,6 +653,8 @@ TypeScript:
 - toggleSelectAll(): get current page ids, if all selected → clearSelection, else selectAll
 - formatPremium(value, currencyCode): use getCurrencySymbol(currencyCode, 'narrow', locale)
     format: ≥1M → 1.1M, ≥1K → 123K, else raw
+
+All methods and the constructor effect must have JSDoc comments.
 
 HTML table with mat-table:
 - All th elements must have scope="col"
@@ -515,6 +706,14 @@ All computed from store.summary() — updates automatically when filters change.
 ```
 Create src/app/features/policy-dashboard/components/filter-panel/ (.ts, .html, .scss, .spec.ts):
 
+At the top of the .ts file add:
+// DECISION: MatBottomSheet over MatDialog for the advanced filters panel
+// ALTERNATIVES CONSIDERED: MatDialog, inline collapsible panel, sidebar
+// REASON: Bottom sheet is the Material 3 pattern for contextual actions on
+// mobile — it slides up from the bottom and does not obscure the full
+// screen on small viewports. On desktop it still presents as a modal
+// panel but with a natural dismiss gesture (swipe or backdrop click).
+
 Standalone, selector: app-filter-panel
 Inject: MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef, LOCALE_ID
 Imports: ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule,
@@ -552,6 +751,22 @@ HTML:
 
 ```
 Create src/app/features/policy-dashboard/components/policy-filter/ (.ts, .html, .scss, .spec.ts):
+
+At the top of the .ts file add:
+// DECISION: URL query params + localStorage for filter persistence
+// ALTERNATIVES CONSIDERED: Store-only state (lost on refresh), cookie storage
+// REASON: URL query params allow filters to be bookmarked and shared — a link
+// sent to a colleague opens the same filtered view. localStorage is the
+// fallback so direct navigation (no query params) still restores the last
+// session's filters. The priority order is: URL params > localStorage > defaults.
+
+// DECISION: debounceTime(400) on the search-term RxJS pipe
+// ALTERNATIVES CONSIDERED: Immediate store update on every keystroke
+// REASON: Without debounce, every character typed triggers a URL update and
+// a localStorage write. debounceTime(400) batches rapid typing into a
+// single update, reducing unnecessary re-renders and history entries.
+// The store.updateFilters() subscription is NOT debounced — the in-memory
+// computed signal filters instantly for a responsive feel.
 
 Standalone, selector: app-policy-filter
 Inject: FormBuilder, Router, ActivatedRoute, MatBottomSheet, StorageService, PolicyStore
@@ -599,6 +814,14 @@ HTML:
 ```
 Create src/app/features/policy-dashboard/components/bulk-action-bar/ (.ts, .html, .scss, .spec.ts):
 
+At the top of the .ts file add:
+// DECISION: aria-live="polite" + aria-atomic="true" on the selection count
+// ALTERNATIVES CONSIDERED: No live region (sighted-only feedback)
+// REASON: Screen readers do not automatically announce dynamic DOM changes.
+// aria-live="polite" queues an announcement after the current speech finishes.
+// aria-atomic="true" ensures the entire count string is read as one unit
+// (e.g. "3 policies selected") rather than just the changed number.
+
 Standalone, selector: app-bulk-action-bar
 Inject: PolicyStore, MatSnackBar
 
@@ -625,6 +848,14 @@ HTML (only shown when store.hasSelection()):
 
 ```
 Create src/app/features/policy-dashboard/components/policy-drilldown-dialog/ (.ts, .html, .scss, .spec.ts):
+
+At the top of the .ts file add:
+// DECISION: signal<Set<string>>(renewingIds) for per-row renew loading state
+// ALTERNATIVES CONSIDERED: Single boolean isRenewing, index-based array
+// REASON: The expiring-policies table can show multiple rows. A Set keyed
+// by policy id allows each row's renew button to show its own spinner
+// independently. Using a signal ensures the template reacts automatically
+// when any id is added or removed.
 
 Standalone, selector: app-policy-drilldown-dialog
 Inject: MAT_DIALOG_DATA (Policy), MatDialogRef, PolicyStore, LOCALE_ID
@@ -657,6 +888,15 @@ HTML:
 
 ```
 Create src/app/features/policy-dashboard/pages/policy-dashboard/ (.ts, .html, .scss, .spec.ts):
+
+At the top of the .ts file add:
+// DECISION: @defer (on idle) wrapping BulkActionBar + PolicyTable
+// ALTERNATIVES CONSIDERED: Eager loading all components, @defer (on viewport)
+// REASON: 'on idle' defers rendering until the browser's requestIdleCallback
+// fires — the page shell (header, filter bar, summary panel) renders first
+// and is immediately interactive. The heavier table component loads during
+// idle time, improving Largest Contentful Paint. A @placeholder block shows
+// LoadingSkeleton so the layout does not shift.
 
 Standalone container component, selector: app-policy-dashboard
 Inject: PolicyStore, MatDialog
@@ -750,6 +990,18 @@ providers: [
   provideHttpClient(withFetch(), withInterceptors([errorInterceptor])),
   provideRouter(routes, withPreloading(PreloadAllModules)),
 ]
+
+Above each provider add an inline comment explaining WHY it is here:
+// provideBrowserGlobalErrorListeners — catches unhandled errors and promise
+//   rejections globally so they surface in the Angular error pipeline
+// provideZonelessChangeDetection — removes zone.js; all CD is signal-driven
+// provideAnimationsAsync — lazy-loads animation code, reducing initial bundle
+// LOCALE_ID: 'en-GB' — sets locale for Angular pipes (date, currency, number)
+//   without needing to call formatDate/formatCurrency manually in every component
+// withFetch() — uses the native Fetch API instead of XHR; enables HTTP/2 streaming
+// withInterceptors([errorInterceptor]) — wires global error normalisation
+// withPreloading(PreloadAllModules) — eagerly preloads lazy routes after bootstrap
+//   so navigation to the dashboard page is instant
 ```
 
 ### Prompt 12.2 — main.ts i18n bootstrap
@@ -760,7 +1012,15 @@ Update src/main.ts:
 - Import localeEnGb from '@angular/common/locales/en-GB'
 - Call registerLocaleData(localeEnGb) BEFORE bootstrapApplication()
 
-This enables Angular's locale-aware pipes (date, currency, number) for en-GB.
+// DECISION: registerLocaleData(localeEnGb) in main.ts
+// ALTERNATIVES CONSIDERED: Using Angular's built-in en locale (default),
+//   or importing locale data inside individual components
+// REASON: Angular's default bundle includes only the 'en' (US) locale.
+// Chubb APAC uses en-GB date and number formatting conventions (DD/MM/YYYY,
+// full ISO week). Calling registerLocaleData once in main.ts makes the
+// locale available globally to all pipes — no per-component imports needed.
+
+Add this comment immediately above the registerLocaleData call in main.ts.
 ```
 
 ---
@@ -889,6 +1149,13 @@ for future i18n extraction.
 ```
 Create eslint.config.js in project root using Angular ESLint flat config format:
 
+// DECISION: ESLint flat config (eslint.config.js) over legacy .eslintrc.json
+// ALTERNATIVES CONSIDERED: .eslintrc.json, Biome
+// REASON: ESLint v9+ uses flat config by default. angular-eslint@22 and
+// typescript-eslint@8 both expect flat config. The old .eslintrc format
+// is deprecated. Flat config is easier to read — it is just a JS array
+// of config objects with explicit file patterns, no implicit inheritance.
+
 import tseslint from 'typescript-eslint'
 import angular from 'angular-eslint'
 
@@ -898,14 +1165,20 @@ export default tseslint.config(
     extends: [...tseslint.configs.recommended, ...angular.configs.tsRecommended],
     processor: angular.processInlineTemplates,
     rules: {
+      // Enforces app prefix on all selectors — prevents collisions with
+      // third-party components and makes component origin obvious in templates
       '@angular-eslint/directive-selector': ['error', { type:'attribute', prefix:'app', style:'camelCase' }],
       '@angular-eslint/component-selector': ['error', { type:'element', prefix:'app', style:'kebab-case' }],
+      // 'any' bypasses TypeScript's type system entirely — treat it as an error
       '@typescript-eslint/no-explicit-any': 'error',
+      // Consistent type imports reduce bundle size and improve IDE tooling
       '@typescript-eslint/consistent-type-imports': 'warn',
     }
   },
   {
     files: ['**/*.html'],
+    // templateAccessibility adds WCAG-aligned rules: missing alt text,
+    // missing form labels, interactive elements needing keyboard support
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {}
   }
