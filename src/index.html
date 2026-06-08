@@ -21,10 +21,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!--
-    Non-render-blocking font loading:
-    rel="preload" downloads CSS immediately without blocking rendering.
-    onload swaps rel to 'stylesheet' once complete.
-    <noscript> provides a fallback for JS-disabled environments.
+    Non-render-blocking Roboto font loading.
+    Material Icons are served locally from node_modules/material-icons
+    (bundled by Angular build) — no CDN round-trip needed.
   -->
   <link rel="preload"
     href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
@@ -32,15 +31,6 @@
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  </noscript>
-
-  <!-- Material Icons: display=optional — uses cached font or skips, never render-blocks -->
-  <link rel="preload"
-    href="https://fonts.googleapis.com/icon?family=Material+Icons&display=optional"
-    as="style"
-    onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=optional" rel="stylesheet">
   </noscript>
 </head>
 <body>

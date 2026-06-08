@@ -28,7 +28,7 @@
       <app-bulk-action-bar />
 
       <section class="dashboard-table">
-        <app-policy-table />
+        <app-policy-table (rowClick)="openPolicyDetail($event)" />
       </section>
     } @placeholder {
       <div class="table-placeholder" aria-busy="true" aria-label="Loading policy table…"></div>

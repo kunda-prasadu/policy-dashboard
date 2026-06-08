@@ -5,55 +5,42 @@
     <div class="drilldown__title" id="drilldown-title">
       <mat-icon [style.color]="meta.color" aria-hidden="true">{{ meta.icon }}</mat-icon>
       <span>{{ dialogTitle }}</span>
-      <span class="drilldown__count" [style.background]="meta.color">{{ policies().length }}</span>
+      @if (data.mode !== 'detail') {
+        <span class="drilldown__count" [style.background]="meta.color">{{ policies().length }}</span>
+      }
     </div>
     <button mat-icon-button (click)="close()" class="drilldown__close" aria-label="Close dialog">
       <mat-icon aria-hidden="true">close</mat-icon>
     </button>
   </div>
 
-  <!-- Table -->
-  <div class="drilldown__body">
-    @if (policies().length === 0) {
-      <div class="drilldown__empty">
-        <mat-icon>search_off</mat-icon>
-        <p>No matching policies found</p>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       DETAIL MODE — single policy card
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (data.mode === 'detail' && detailPolicy(); as p) {
+    <div class="drilldown__body detail-body">
+
+      <!-- Status + Flag badges -->
+      <div class="detail-badges">
+        <span class="status-pill status-pill--{{ p.status.toLowerCase() }}">{{ p.status }}</span>
+        @if (p.flaggedForReview) {
+          <span class="flag-pill"><mat-icon>flag</mat-icon> Flagged for Review</span>
+        }
       </div>
-    } @else {
-      <table mat-table [dataSource]="policies()" class="drilldown-table" [attr.aria-label]="dialogTitle + ' policies'" [trackBy]="trackById">
 
-        <!-- Days Left (expiring mode only) -->
-        <ng-container matColumnDef="daysLeft">
-          <th mat-header-cell *matHeaderCellDef>Urgency</th>
-          <td mat-cell *matCellDef="let p">
-            <span class="days-badge" [ngClass]="urgencyClass(p.expiryDate)">
-              {{ daysLeft(p.expiryDate) }}d left
-            </span>
-          </td>
-        </ng-container>
-
-        <!-- Policy Number -->
-        <ng-container matColumnDef="policyNumber">
-          <th mat-header-cell *matHeaderCellDef>Policy No.</th>
-          <td mat-cell *matCellDef="let p" class="cell-mono">{{ p.policyNumber }}</td>
-        </ng-container>
-
-        <!-- Holder -->
-        <ng-container matColumnDef="policyHolderName">
-          <th mat-header-cell *matHeaderCellDef>Policy Holder</th>
-          <td mat-cell *matCellDef="let p">{{ p.policyHolderName }}</td>
-        </ng-container>
-
-        <!-- Region -->
-        <ng-container matColumnDef="region">
-          <th mat-header-cell *matHeaderCellDef>Region</th>
-          <td mat-cell *matCellDef="let p">{{ p.region }}</td>
-        </ng-container>
-
-        <!-- LOB -->
-        <ng-container matColumnDef="lineOfBusiness">
-          <th mat-header-cell *matHeaderCellDef>LOB</th>
-          <td mat-cell *matCellDef="let p">
+      <!-- 2-column field grid -->
+      <div class="detail-grid">
+        <div class="detail-field">
+          <span class="detail-label">Policy Number</span>
+          <span class="detail-value detail-value--mono">{{ p.policyNumber }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Policy Holder</span>
+          <span class="detail-value">{{ p.policyHolderName }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Line of Business</span>
+          <span class="detail-value">
             <span class="lob-chip"
               [class.lob-chip--property]="p.lineOfBusiness === 'Property'"
               [class.lob-chip--casualty]="p.lineOfBusiness === 'Casualty'"
@@ -61,63 +48,183 @@
               [class.lob-chip--marine]="p.lineOfBusiness === 'Marine'">
               {{ p.lineOfBusiness }}
             </span>
-          </td>
-        </ng-container>
-
-        <!-- Premium -->
-        <ng-container matColumnDef="premium">
-          <th mat-header-cell *matHeaderCellDef>Premium</th>
-          <td mat-cell *matCellDef="let p" class="cell-mono">
-            {{ formatPremium(p.premiumAmount, p.currency) }}
-          </td>
-        </ng-container>
-
-        <!-- Expiry -->
-        <ng-container matColumnDef="expiryDate">
-          <th mat-header-cell *matHeaderCellDef>Expiry Date</th>
-          <td mat-cell *matCellDef="let p">{{ formatDate(p.expiryDate) }}</td>
-        </ng-container>
-
-        <!-- Flagged -->
-        <ng-container matColumnDef="flagged">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let p" class="cell-flag">
-            @if (p.flaggedForReview) {
-              <mat-icon class="flag-icon" matTooltip="Flagged for review" aria-hidden="true">flag</mat-icon>
+          </span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Region</span>
+          <span class="detail-value">{{ p.region }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Premium</span>
+          <span class="detail-value detail-value--premium">{{ formatPremium(p.premiumAmount, p.currency) }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Currency</span>
+          <span class="detail-value">{{ p.currency }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Effective Date</span>
+          <span class="detail-value">{{ formatDate(p.effectiveDate) }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="detail-label">Expiry Date</span>
+          <span class="detail-value" [class.detail-value--warn]="daysLeft(p.expiryDate) <= 30 && daysLeft(p.expiryDate) > 0">
+            {{ formatDate(p.expiryDate) }}
+            @if (daysLeft(p.expiryDate) > 0 && daysLeft(p.expiryDate) <= 30) {
+              <span class="days-badge" [ngClass]="urgencyClass(p.expiryDate)">{{ daysLeft(p.expiryDate) }}d left</span>
             }
-          </td>
-        </ng-container>
+          </span>
+        </div>
+        <div class="detail-field detail-field--full">
+          <span class="detail-label">Underwriter</span>
+          <span class="detail-value">{{ p.underwriter }}</span>
+        </div>
+      </div>
 
-        <!-- Renew (expiring mode only) -->
-        <ng-container matColumnDef="renew">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let p" class="cell-renew">
-            <button mat-stroked-button class="renew-btn"
-              [disabled]="renewingIds().has(p.id)"
-              (click)="renew(p.id)"
-              [attr.aria-label]="'Renew policy ' + p.policyNumber"
-              matTooltip="Renew policy — set status to Active">
-              @if (renewingIds().has(p.id)) {
-                <mat-progress-spinner diameter="14" mode="indeterminate" strokeWidth="2" aria-label="Renewing…" />
-              } @else {
-                <mat-icon aria-hidden="true">autorenew</mat-icon>
+      <!-- Actions -->
+      <div class="detail-actions">
+        @if (p.status === 'Expired' || p.status === 'Cancelled') {
+          <button mat-flat-button color="primary"
+            [disabled]="isRenewing()"
+            (click)="renew(p.id)"
+            [attr.aria-label]="'Renew policy ' + p.policyNumber">
+            @if (isRenewing()) {
+              <mat-progress-spinner diameter="16" mode="indeterminate" strokeWidth="2" />
+            } @else {
+              <mat-icon>autorenew</mat-icon>
+            }
+            Renew Policy
+          </button>
+        }
+        @if (!p.flaggedForReview) {
+          <button mat-stroked-button (click)="flagDetail()"
+            [attr.aria-label]="'Flag policy ' + p.policyNumber + ' for review'">
+            <mat-icon>flag</mat-icon>
+            Flag for Review
+          </button>
+        }
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="drilldown__footer">
+      <span class="drilldown__footer-info">Policy ID: {{ p.id }}</span>
+      <button mat-stroked-button (click)="close()">Close</button>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TABLE MODES — status list / expiring list
+       ═══════════════════════════════════════════════════════════════════════ -->
+  @if (data.mode !== 'detail') {
+    <!-- Table -->
+    <div class="drilldown__body">
+      @if (policies().length === 0) {
+        <div class="drilldown__empty">
+          <mat-icon>search_off</mat-icon>
+          <p>No matching policies found</p>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="policies()" class="drilldown-table" [attr.aria-label]="dialogTitle + ' policies'" [trackBy]="trackById">
+
+          <!-- Days Left (expiring mode only) -->
+          <ng-container matColumnDef="daysLeft">
+            <th mat-header-cell *matHeaderCellDef>Urgency</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="days-badge" [ngClass]="urgencyClass(p.expiryDate)">
+                {{ daysLeft(p.expiryDate) }}d left
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Policy Number -->
+          <ng-container matColumnDef="policyNumber">
+            <th mat-header-cell *matHeaderCellDef>Policy No.</th>
+            <td mat-cell *matCellDef="let p" class="cell-mono">{{ p.policyNumber }}</td>
+          </ng-container>
+
+          <!-- Holder -->
+          <ng-container matColumnDef="policyHolderName">
+            <th mat-header-cell *matHeaderCellDef>Policy Holder</th>
+            <td mat-cell *matCellDef="let p">{{ p.policyHolderName }}</td>
+          </ng-container>
+
+          <!-- Region -->
+          <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef>Region</th>
+            <td mat-cell *matCellDef="let p">{{ p.region }}</td>
+          </ng-container>
+
+          <!-- LOB -->
+          <ng-container matColumnDef="lineOfBusiness">
+            <th mat-header-cell *matHeaderCellDef>LOB</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="lob-chip"
+                [class.lob-chip--property]="p.lineOfBusiness === 'Property'"
+                [class.lob-chip--casualty]="p.lineOfBusiness === 'Casualty'"
+                [class.lob-chip--ah]="p.lineOfBusiness === 'A&H'"
+                [class.lob-chip--marine]="p.lineOfBusiness === 'Marine'">
+                {{ p.lineOfBusiness }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Premium -->
+          <ng-container matColumnDef="premium">
+            <th mat-header-cell *matHeaderCellDef>Premium</th>
+            <td mat-cell *matCellDef="let p" class="cell-mono">
+              {{ formatPremium(p.premiumAmount, p.currency) }}
+            </td>
+          </ng-container>
+
+          <!-- Expiry -->
+          <ng-container matColumnDef="expiryDate">
+            <th mat-header-cell *matHeaderCellDef>Expiry Date</th>
+            <td mat-cell *matCellDef="let p">{{ formatDate(p.expiryDate) }}</td>
+          </ng-container>
+
+          <!-- Flagged -->
+          <ng-container matColumnDef="flagged">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p" class="cell-flag">
+              @if (p.flaggedForReview) {
+                <mat-icon class="flag-icon" matTooltip="Flagged for review" aria-hidden="true">flag</mat-icon>
               }
-              Renew
-            </button>
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns();" [ngClass]="rowUrgencyClass(row)"></tr>
+          <!-- Renew (expiring mode only) -->
+          <ng-container matColumnDef="renew">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let p" class="cell-renew">
+              <button mat-stroked-button class="renew-btn"
+                [disabled]="renewingIds().has(p.id)"
+                (click)="renew(p.id)"
+                [attr.aria-label]="'Renew policy ' + p.policyNumber"
+                matTooltip="Renew policy — set status to Active">
+                @if (renewingIds().has(p.id)) {
+                  <mat-progress-spinner diameter="14" mode="indeterminate" strokeWidth="2" aria-label="Renewing…" />
+                } @else {
+                  <mat-icon aria-hidden="true">autorenew</mat-icon>
+                }
+                Renew
+              </button>
+            </td>
+          </ng-container>
 
-      </table>
-    }
-  </div>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns();" [ngClass]="rowUrgencyClass(row)"></tr>
 
-  <!-- Footer -->
-  <div class="drilldown__footer">
-    <span class="drilldown__footer-info">{{ footerLabel }}</span>
-    <button mat-stroked-button (click)="close()">Close</button>
-  </div>
+        </table>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="drilldown__footer">
+      <span class="drilldown__footer-info">{{ footerLabel }}</span>
+      <button mat-stroked-button (click)="close()">Close</button>
+    </div>
+  }
 
 </div>

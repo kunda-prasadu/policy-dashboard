@@ -4,40 +4,52 @@
   <h2 class="summary-section__title">Policy Status</h2>
   <div class="summary-grid summary-grid--4">
 
-    <div class="summary-card summary-card--active summary-card--clickable" (click)="openDrilldown('status', 'Active')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Active')">
+    <div class="summary-card summary-card--active summary-card--clickable" (click)="openDrilldown('status', 'Active')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Active')" matTooltip="Click to view Active policies">
       <div class="summary-card__content">
         <span class="summary-card__label">Active Policies</span>
         <span class="summary-card__count">{{ summary().activeCount }}</span>
         <span class="summary-card__sub">currently in force</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>task_alt</mat-icon></div>
+      <div class="summary-card__icon">
+        <mat-icon>task_alt</mat-icon>
+        <mat-icon class="card-view-hint" aria-hidden="true">format_list_bulleted</mat-icon>
+      </div>
     </div>
 
-    <div class="summary-card summary-card--pending summary-card--clickable" (click)="openDrilldown('status', 'Pending')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Pending')">
+    <div class="summary-card summary-card--pending summary-card--clickable" (click)="openDrilldown('status', 'Pending')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Pending')" matTooltip="Click to view Pending policies">
       <div class="summary-card__content">
         <span class="summary-card__label">Pending Policies</span>
         <span class="summary-card__count">{{ summary().pendingCount }}</span>
         <span class="summary-card__sub">awaiting approval</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>schedule</mat-icon></div>
+      <div class="summary-card__icon">
+        <mat-icon>schedule</mat-icon>
+        <mat-icon class="card-view-hint" aria-hidden="true">format_list_bulleted</mat-icon>
+      </div>
     </div>
 
-    <div class="summary-card summary-card--expired summary-card--clickable" (click)="openDrilldown('status', 'Expired')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Expired')">
+    <div class="summary-card summary-card--expired summary-card--clickable" (click)="openDrilldown('status', 'Expired')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Expired')" matTooltip="Click to view Expired policies">
       <div class="summary-card__content">
         <span class="summary-card__label">Expired Policies</span>
         <span class="summary-card__count">{{ summary().expiredCount }}</span>
         <span class="summary-card__sub">past coverage end</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>warning_amber</mat-icon></div>
+      <div class="summary-card__icon">
+        <mat-icon>warning_amber</mat-icon>
+        <mat-icon class="card-view-hint" aria-hidden="true">format_list_bulleted</mat-icon>
+      </div>
     </div>
 
-    <div class="summary-card summary-card--cancelled summary-card--clickable" (click)="openDrilldown('status', 'Cancelled')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Cancelled')">
+    <div class="summary-card summary-card--cancelled summary-card--clickable" (click)="openDrilldown('status', 'Cancelled')" role="button" tabindex="0" (keydown.enter)="openDrilldown('status', 'Cancelled')" matTooltip="Click to view Cancelled policies">
       <div class="summary-card__content">
         <span class="summary-card__label">Cancelled Policies</span>
         <span class="summary-card__count">{{ summary().cancelledCount }}</span>
         <span class="summary-card__sub">terminated policies</span>
       </div>
-      <div class="summary-card__icon"><mat-icon>cancel</mat-icon></div>
+      <div class="summary-card__icon">
+        <mat-icon>cancel</mat-icon>
+        <mat-icon class="card-view-hint" aria-hidden="true">format_list_bulleted</mat-icon>
+      </div>
     </div>
 
   </div>

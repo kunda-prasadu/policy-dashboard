@@ -62,6 +62,23 @@ export class PolicyFilter implements OnDestroy {
     return count;
   });
 
+  /**
+   * Chips shown below the search bar — one per active advanced filter.
+   * Each chip carries a human-readable label and the form key needed to remove it.
+   */
+  readonly activeFilterChips = computed(() => {
+    const f = this.store.filters();
+    const chips: Array<{ key: string; label: string }> = [];
+    if (f.status)         chips.push({ key: 'status',         label: `Status: ${f.status}` });
+    if (f.region)         chips.push({ key: 'region',         label: `Region: ${f.region}` });
+    if (f.lineOfBusiness) chips.push({ key: 'lineOfBusiness', label: `LoB: ${f.lineOfBusiness}` });
+    if (f.startDate)      chips.push({ key: 'startDate',      label: `From: ${this.formatDate(f.startDate)}` });
+    if (f.endDate)        chips.push({ key: 'endDate',        label: `To: ${this.formatDate(f.endDate)}` });
+    if (f.minPremium && f.minPremium > 0)
+      chips.push({ key: 'minPremium', label: `Min: $${Math.round(f.minPremium / 1_000)}K` });
+    return chips;
+  });
+
   constructor() {
     // ── 1. Seed form: URL params take priority, then localStorage, then defaults
     const p = this.route.snapshot.queryParams;
@@ -178,6 +195,39 @@ export class PolicyFilter implements OnDestroy {
 
   private toDateParam(d: Date): string {
     return d.toISOString().split('T')[0];
+  }
+
+  private formatDate(d: Date): string {
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  /**
+   * Removes a single active filter by key.
+   * Patches only the relevant form control and lets the existing
+   * valueChanges subscription propagate the update to the store and URL.
+   */
+  removeFilter(key: string): void {
+    switch (key) {
+      case 'status':         this.filterForm.patchValue({ status: '' });          break;
+      case 'region':         this.filterForm.patchValue({ region: '' });          break;
+      case 'lineOfBusiness': this.filterForm.patchValue({ lineOfBusiness: '' }); break;
+      case 'startDate':      this.filterForm.patchValue({ startDate: null });     break;
+      case 'endDate':        this.filterForm.patchValue({ endDate: null });       break;
+      case 'minPremium':     this.filterForm.patchValue({ minPremium: 0 });       break;
+    }
+    // Re-fetch when a server-side filter chip is removed.
+    if (['status', 'region', 'lineOfBusiness', 'minPremium'].includes(key)) {
+      this.store.loadingPolicies();
+    }
+  }
+
+  /** Clears all advanced filters in one action (preserves search term). */
+  clearAllFilters(): void {
+    this.filterForm.patchValue({
+      status: '', region: '', lineOfBusiness: '',
+      startDate: null, endDate: null, minPremium: 0,
+    });
+    this.store.loadingPolicies();
   }
 
   ngOnDestroy(): void {

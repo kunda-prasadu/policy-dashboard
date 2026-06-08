@@ -26,7 +26,7 @@
       "region": "Thailand",
       "underwriter": "May Donnelly",
       "status": "Pending",
-      "flaggedForReview": false
+      "flaggedForReview": true
     },
     {
       "id": "e1bc20d7-a3b3-45b4-b493-bd4a0a60864a",
@@ -236,7 +236,7 @@
       "region": "Indonesia",
       "underwriter": "Devan Nicolas",
       "status": "Cancelled",
-      "flaggedForReview": false
+      "flaggedForReview": true
     },
     {
       "id": "e2dac9c3-697e-4d13-a2f9-3a39b5a02b71",

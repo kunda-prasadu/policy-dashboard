@@ -1,4 +1,4 @@
-import { Component, effect, inject, LOCALE_ID, viewChild } from '@angular/core';
+import { Component, effect, inject, LOCALE_ID, viewChild, output, signal, computed } from '@angular/core';
 import { PolicyStore } from '../../store/policy.store';
 import { CommonModule, getCurrencySymbol } from '@angular/common';
 import { Policy } from '../../models/policy.model';
@@ -22,15 +22,49 @@ export class PolicyTable {
   private readonly storage = inject(StorageService);
   private readonly locale  = inject(LOCALE_ID);
 
+  /** Emits the Policy the user clicked to view its details. */
+  readonly rowClick = output<Policy>();
+
   private static readonly PAGE_SIZE_KEY = 'policy-page-size';
   private static readonly DEFAULT_PAGE_SIZE = 10;
 
-  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged'];
+  displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged', 'actions'];
   dataSource = new MatTableDataSource<Policy>();
   readonly initialPageSize = this.storage.get<number>(PolicyTable.PAGE_SIZE_KEY) ?? PolicyTable.DEFAULT_PAGE_SIZE;
 
   sort = viewChild(MatSort);
   paginator = viewChild(MatPaginator);
+
+  /** Tracks the current paginator page index — updated by the page subscription. */
+  private readonly _pageIndex = signal(0);
+  /** Tracks the current page size — updated by the page subscription. */
+  private readonly _pageSize  = signal(this.initialPageSize);
+
+  /**
+   * IDs of policies visible on the current page.
+   * WHY THIS APPROACH: computed() reacts synchronously to store.filteredPolicies(),
+   * _pageIndex, and _pageSize. Using dataSource.filteredData was unreliable because
+   * MatTableDataSource updates filteredData asynchronously via an observable pipeline,
+   * causing pageIds to be stale/empty at the moment the effect fired.
+   */
+  readonly pageIds = computed(() => {
+    const data  = this.store.filteredPolicies();
+    const start = this._pageIndex() * this._pageSize();
+    return data.slice(start, start + this._pageSize()).map(p => p.id);
+  });
+
+  /** True when every policy on the current page is selected. Drives the header checkbox [checked]. */
+  readonly isAllOnPageSelected = computed(() => {
+    const ids = this.pageIds();
+    if (!ids.length) return false;
+    return ids.every(id => this.store.selectedPolicyIds().includes(id));
+  });
+
+  /** True when some (but not all) policies on the current page are selected. Drives [indeterminate]. */
+  readonly isSomeOnPageSelected = computed(() => {
+    const ids = this.pageIds();
+    return ids.some(id => this.store.selectedPolicyIds().includes(id)) && !this.isAllOnPageSelected();
+  });
 
   constructor() {
     this.dataSource.data = this.store.filteredPolicies();
@@ -40,6 +74,8 @@ export class PolicyTable {
       // Reset to page 1 whenever the filtered dataset changes so users never
       // land on a non-existent page after applying or clearing a filter.
       this.paginator()?.firstPage();
+      // Reset _pageIndex so pageIds computed re-derives from page 0 immediately.
+      this._pageIndex.set(0);
     });
   }
 
@@ -58,6 +94,9 @@ export class PolicyTable {
       this.dataSource.paginator = paginator;
       paginator.page.subscribe(e => {
         this.storage.set(PolicyTable.PAGE_SIZE_KEY, e.pageSize);
+        // Update the tracking signals so pageIds computed re-derives for the new page.
+        this._pageIndex.set(e.pageIndex);
+        this._pageSize.set(e.pageSize);
       });
     }
   }
@@ -67,15 +106,11 @@ export class PolicyTable {
   }
 
   toggleSelectAll(): void {
-    const paginator = this.paginator();
-    const pageStart = paginator ? paginator.pageIndex * paginator.pageSize : 0;
-    const pageEnd = paginator ? pageStart + paginator.pageSize : this.dataSource.filteredData.length;
-    const pageIds = this.dataSource.filteredData.slice(pageStart, pageEnd).map((p: Policy) => p.id);
-    const allSelected = pageIds.every((id: string) => this.store.selectedPolicyIds().includes(id));
-    if (allSelected) {
+    // Use the pre-computed pageIds signal rather than re-slicing the data source.
+    if (this.isAllOnPageSelected()) {
       this.store.clearSelection();
     } else {
-      this.store.selectAll(pageIds);
+      this.store.selectAll(this.pageIds());
     }
   }
 

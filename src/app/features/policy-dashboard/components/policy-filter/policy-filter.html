@@ -19,3 +19,20 @@
   </button>
 
 </form>
+
+@if (activeFilterChips().length > 0) {
+  <div class="active-filters" role="group" aria-label="Active filters">
+    @for (chip of activeFilterChips(); track chip.key) {
+      <span class="active-filter-chip">
+        {{ chip.label }}
+        <button class="chip-remove" (click)="removeFilter(chip.key)"
+          [attr.aria-label]="'Remove filter: ' + chip.label">
+          <mat-icon>close</mat-icon>
+        </button>
+      </span>
+    }
+    <button mat-button class="clear-all-btn" (click)="clearAllFilters()">
+      Clear all
+    </button>
+  </div>
+}
