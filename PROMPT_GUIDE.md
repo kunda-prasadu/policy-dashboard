@@ -641,16 +641,39 @@ At the top of the .ts file add:
 TypeScript:
 - Inject: PolicyStore, StorageService, LOCALE_ID
 - PAGE_SIZE_KEY = 'policy-page-size', DEFAULT_PAGE_SIZE = 10
-- displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged']
+- displayedColumns = ['select', 'policyNumber', 'policyHolderName', 'lineOfBusiness', 'status', 'region', 'premium', 'flagged', 'actions']
 - dataSource = new MatTableDataSource<Policy>()
 - initialPageSize from StorageService ?? 10
 - sort = viewChild(MatSort), paginator = viewChild(MatPaginator)
-- constructor: effect(() => { dataSource.data = store.filteredPolicies(); paginator()?.firstPage(); })
+- output<Policy>() rowClick — emits when the view-details button is clicked for a row
+
+// DECISION: _pageIndex / _pageSize signals + computed pageIds instead of reading
+//           dataSource.filteredData inside an updatePageIds() helper
+// ALTERNATIVES CONSIDERED: Reading dataSource.filteredData synchronously in an effect
+// REASON: MatTableDataSource updates filteredData asynchronously through an RxJS
+// pipeline, so any synchronous read of filteredData immediately after setting
+// dataSource.data returns stale/empty data. Maintaining _pageIndex and _pageSize as
+// plain signals and deriving pageIds as a computed() that reads store.filteredPolicies()
+// directly guarantees a fully synchronous, always-accurate result.
+- _pageIndex = signal(0) — updated by paginator.page subscription
+- _pageSize  = signal(initialPageSize) — updated by paginator.page subscription
+- pageIds = computed(() => store.filteredPolicies().slice(start, start+size).map(p => p.id))
+- isAllOnPageSelected = computed(() => pageIds().every(id => store.selectedPolicyIds().includes(id)))
+- isSomeOnPageSelected = computed(() => pageIds().some(...) && !isAllOnPageSelected())
+
+- constructor: effect(() => {
+    dataSource.data = store.filteredPolicies();
+    paginator()?.firstPage();
+    _pageIndex.set(0); // reset so pageIds re-derives from page 0
+  })
 - ngAfterViewInit:
     - sort: subscribe to sortChange → store.updateSort() → store.loadingPolicies()
       (do NOT assign sort to dataSource — server-side sort)
-    - paginator: assign to dataSource, subscribe page → save pageSize to StorageService
-- toggleSelectAll(): get current page ids, if all selected → clearSelection, else selectAll
+    - paginator: assign to dataSource, subscribe page → save pageSize to StorageService,
+      update _pageIndex.set(e.pageIndex) and _pageSize.set(e.pageSize)
+- toggleSelectAll():
+    if isAllOnPageSelected() → store.clearSelection()
+    else → store.selectAll(pageIds())
 - formatPremium(value, currencyCode): use getCurrencySymbol(currencyCode, 'narrow', locale)
     format: ≥1M → 1.1M, ≥1K → 123K, else raw
 
@@ -659,8 +682,12 @@ All methods and the constructor effect must have JSDoc comments.
 HTML table with mat-table:
 - All th elements must have scope="col"
 - aria-label="Policy data table" on table
+- Header checkbox: [checked]="isAllOnPageSelected()" [indeterminate]="isSomeOnPageSelected()"
 - Columns: select (mat-checkbox), policyNumber, policyHolderName, lineOfBusiness,
-  status (status-badge with dot), region, premium, flagged (mat-icon flag)
+  status (status-badge with dot), region, premium, flagged (mat-icon flag), actions
+- actions column: mat-icon-button with manage_search icon,
+    (click)="rowClick.emit(policy); $event.stopPropagation()"
+    matTooltip="View policy details"
 - mat-paginator with [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons
 - Wrap table in <div class="table-responsive-wrapper"> for horizontal scroll on mobile
 - Empty state when filteredPolicies().length === 0:
@@ -800,6 +827,16 @@ openFilters():
     if result is filter object → form.patchValue(result) → store.loadingPolicies()
   })
 
+computed activeFilterChips: Array<{ key: string; label: string }> — one entry per active
+  advanced filter (status, region, lineOfBusiness, minPremium, startDate, endDate).
+  Used to render individual removable chips below the search bar without opening the sheet.
+
+removeFilter(key): patches the matching form control to its default, calls
+  store.loadingPolicies() for server-side enum filters.
+
+clearAllFilters(): resets all advanced fields (preserves searchTerm), calls
+  store.loadingPolicies().
+
 HTML:
 - form.filter-bar with search mat-form-field
 - "All Filters" mat-stroked-button:
@@ -807,6 +844,16 @@ HTML:
     aria-haspopup="dialog"
     [attr.aria-label]="activeFilterCount() > 0 ? 'All Filters, N active' : 'All Filters'"
     show badge count when activeFilterCount() > 0
+- Below the form, @if (activeFilterChips().length > 0) render a chip strip:
+    @for (chip of activeFilterChips(); track chip.key)
+      <span class="active-filter-chip">{{ chip.label }}
+        <button (click)="removeFilter(chip.key)">×</button>
+      </span>
+    <button (click)="clearAllFilters()">Clear all</button>
+
+// WHY CHIPS STRIP: Users should see which filters are active without having to
+// re-open the bottom sheet. Individual remove buttons let them clear one filter
+// at a time; "Clear all" removes all in one click.
 ```
 
 ### Prompt 9.5 — BulkActionBar component
@@ -907,10 +954,16 @@ Imports: PolicyFilter, SummaryPanel, BulkActionBar, PolicyTable,
 
 ngOnInit: store.loadingPolicies()
 
-openDrilldown(policy: Policy):
+// DECISION: openPolicyDetail() passes mode:'detail' + the full Policy object
+// ALTERNATIVES CONSIDERED: Passing only the policy ID and looking it up inside the dialog
+// REASON: Passing the full object avoids an extra store lookup at open time and ensures
+// the dialog can display data even before the store has loaded. The dialog also derives
+// a live computed() from the store so it stays reactive after mutations (flag / renew).
+
+openPolicyDetail(policy: Policy):
   dialog.open(PolicyDrilldownDialog, {
-    data: policy,
-    width: '900px', maxWidth: '96vw',
+    data: { mode: 'detail', policy },
+    width: '600px', maxWidth: '96vw',
     panelClass: 'drilldown-dialog-panel'
   })
 
@@ -931,7 +984,7 @@ HTML structure:
           [message]="store.error()!"
           (retryClick)="store.loadingPolicies()" />
       } @else {
-        <app-policy-table (rowClick)="openDrilldown($event)" />
+        <app-policy-table (rowClick)="openPolicyDetail($event)" />
       }
     </section>
   } @placeholder {
@@ -1077,20 +1130,32 @@ Update src/index.html:
    <meta name="referrer" content="strict-origin-when-cross-origin">
    Note: X-Frame-Options and X-Content-Type-Options must be HTTP headers, not meta tags
 
-3. Non-render-blocking Google Fonts preload pattern:
+3. Fonts — Roboto only via the non-render-blocking Google Fonts preload pattern:
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   For each font (Roboto, Material Icons):
-     <link rel="preload" href="[font-url]" as="style" onload="this.onload=null;this.rel='stylesheet'">
-     <noscript><link rel="stylesheet" href="[font-url]"></noscript>
-```
+   <link rel="preload" href="[roboto-url]" as="style" onload="this.onload=null;this.rel='stylesheet'">
+   <noscript><link rel="stylesheet" href="[roboto-url]"></noscript>
+
+   // DECISION: Material Icons served from the local npm package, NOT from Google Fonts CDN
+   // ALTERNATIVES CONSIDERED: Google Fonts CDN link in index.html
+   // REASON: A CDN dependency means icons fail to load in offline/air-gapped environments
+   // and in CI. The 'material-icons' npm package bundles the woff2 font file; Angular CLI
+   // copies it into dist/media/ at build time. The CSS is added to angular.json styles[]
+   // so it is tree-shaken and versioned with the app.
+   DO NOT add a Material Icons <link> from fonts.googleapis.com — icons are served locally (see angular.json step below).
 
 ### Prompt 14.2 — angular.json headers and budgets
 
 ```
 Update angular.json:
 
-1. Under architect.serve.options, add headers:
+1. Install the Material Icons npm package and add it to the styles array:
+   npm install material-icons
+   In angular.json under architect.build.options.styles, add BEFORE src/styles.scss:
+     "node_modules/material-icons/iconfont/material-icons.css"
+   This bundles the icon font (woff2) into the build output so icons work without a CDN.
+
+2. Under architect.serve.options, add headers:
    {
      "X-Frame-Options": "SAMEORIGIN",
      "X-Content-Type-Options": "nosniff",
@@ -1415,12 +1480,20 @@ Also verify:
 - http://localhost:4200 loads the dashboard
 - Dark/light theme toggle works
 - Filters update the table and summary panel
-- Multi-select + flag for review works with snackbar feedback
+- Active filter chips appear below the search bar for each applied filter;
+  individual × buttons remove one filter; "Clear all" removes all
+- Header checkbox selects / deselects all 10 rows on the current page;
+  navigating to another page correctly shows that page's selection state
+- Multi-select + flag for review works with snackbar feedback;
+  after flagging, the checkboxes clear automatically
 - Sorting triggers API re-fetch
-- Policy drill-down dialog opens on row click
-- Renew button in drill-down works
+- Clicking manage_search on a table row opens the policy detail card
+  (not a list) showing all 9 fields, status/flag badges, and action buttons
+- Renew button in detail card works for Expired/Cancelled policies
+- Summary card clicks still open the status-list drilldown (not detail mode)
 - Error state and retry works (temporarily break API URL)
 - Loading skeleton appears on initial load
+- Material icons render from the local npm package (no CDN link in index.html)
 ```
 
 ---

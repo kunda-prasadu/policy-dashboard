@@ -12,11 +12,12 @@ A production-quality insurance policy management dashboard built with **Angular 
 | **Expiring Widget** | SVG arc progress indicator showing % of active policies expiring within 30 days; animated stroke-dashoffset |
 | **GWP Breakdown** | Animated progress bars for Gross Written Premium across 4 lines of business (Marine, Property, Liability, Casualty) |
 | **Policy Table** | Sortable, paginated table with inline flag-for-review toggle; bulk row selection |
-| **Drill-down Dialog** | Full policy list filtered by status or expiry window; expiring mode adds urgency badges (critical / high / low) and row tinting |
+| **Drill-down Dialog** | Clicking the `manage_search` button on any table row opens a single-policy detail card (all 9 fields, status/flag badges, Renew and Flag actions). Clicking a summary card opens a full filtered policy list for that status, with urgency badges and row tinting for expiring policies |
 | **Renew Button** | Optimistic PATCH to mark expiring policies Active; spinner feedback during in-flight request |
-| **Filter Bar** | Instant search (policy number, holder, underwriter) + bottom-sheet "All Filters" (status, region, LOB, premium range, date range) |
+| **Filter Bar** | Instant search (policy number, holder, underwriter) + bottom-sheet "All Filters" (status, region, LOB, premium range, date range); active filters shown as removable chips below the search bar without re-opening the sheet |
 | **URL Sync** | All active filters are reflected in URL query params; shareable and browser-back compatible |
-| **Bulk Flag** | Select multiple policies and flag for underwriter review in one action; per-policy PATCH + snackbar confirmation |
+| **Bulk Flag** | Select multiple policies and flag for underwriter review in one action; per-policy PATCH + snackbar confirmation; checkboxes clear automatically after flagging |
+| **Select All** | Header checkbox selects / deselects all rows on the current page; page navigation updates the checkbox state to reflect the new page |
 | **Dark / Light Theme** | Toggle persisted to `localStorage`; CSS custom properties (`--mat-sys-*`) throughout |
 | **Loading Skeleton** | Shimmer placeholder rendered while the initial API call is in-flight |
 | **Error State** | Graceful error card with a retry button |
@@ -31,6 +32,7 @@ A production-quality insurance policy management dashboard built with **Angular 
 | UI Library | Angular Material 3 (`MatDialog`, `MatTable`, `MatBottomSheet`, `MatSnackBar`, …) |
 | State | Custom signal store — `signal()`, `computed()`, `effect()` — no NgRx |
 | Styling | SCSS + BEM, Material 3 CSS tokens, `::ng-deep` MDC overrides |
+| Icons | `material-icons` npm package (bundled locally — no CDN dependency) |
 | Mock API | JSON Server (port 3000), GET + PATCH, 250+ seeded records |
 | Testing | Jasmine + Karma + ChromeHeadless — 95 passing tests |
 | Build | Angular CLI 20 / esbuild |
@@ -49,7 +51,7 @@ A production-quality insurance policy management dashboard built with **Angular 
 ### 1. Install dependencies
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ### 2. Start the mock API
